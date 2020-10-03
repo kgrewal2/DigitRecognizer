@@ -26,6 +26,11 @@ dependencies {
 	implementation "org.deeplearning4j:deeplearning4j-zoo:0.9.1"
 }
 
+compileJava {
+	sourceCompatibility = '1.8'
+	targetCompatibility = '1.8'
+}
+
 application {
     mainClassName = 'ramo.klevis.Run'
 }
