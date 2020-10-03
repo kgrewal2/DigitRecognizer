@@ -9,3 +9,9 @@
 
 # Ignore Gradle build output directory
 build
+bin
+.settings
+
+# Ignore VSCode-generated files
+.classpath
+.project
