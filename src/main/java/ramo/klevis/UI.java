@@ -1,12 +1,9 @@
-package ramo.klevis.ui;
+package ramo.klevis;
 
 import com.mortennobel.imagescaling.ResampleFilters;
 import com.mortennobel.imagescaling.ResampleOp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ramo.klevis.cnn.ConvolutionalNeuralNetwork;
-import ramo.klevis.data.LabeledImage;
-import ramo.klevis.nn.NeuralNetwork;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -136,7 +133,8 @@ public class UI {
 
             if (i == JOptionPane.OK_OPTION) {
                 ProgressBar progressBar = new ProgressBar(mainFrame);
-                SwingUtilities.invokeLater(() -> progressBar.showProgressBar("Training may take one or two minutes..."));
+                SwingUtilities
+                        .invokeLater(() -> progressBar.showProgressBar("Training may take one or two minutes..."));
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of train Neural Network");
@@ -152,7 +150,8 @@ public class UI {
         JButton trainCNN = new JButton("Train Convolutional NN");
         trainCNN.addActionListener(e -> {
 
-            int i = JOptionPane.showConfirmDialog(mainFrame, "Are you sure, training requires >10GB memory and more than 1 hour?");
+            int i = JOptionPane.showConfirmDialog(mainFrame,
+                    "Are you sure, training requires >10GB memory and more than 1 hour?");
 
             if (i == JOptionPane.OK_OPTION) {
                 ProgressBar progressBar = new ProgressBar(mainFrame);
@@ -160,7 +159,8 @@ public class UI {
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of train Convolutional Neural Network");
-                        convolutionalNeuralNetwork.train((Integer) trainField.getValue(), (Integer) testField.getValue());
+                        convolutionalNeuralNetwork.train((Integer) trainField.getValue(),
+                                (Integer) testField.getValue());
                         LOGGER.info("End of train Convolutional Neural Network");
                     } catch (IOException e1) {
                         LOGGER.error("CNN not trained " + e1);
@@ -193,7 +193,6 @@ public class UI {
         mainPanel.add(topPanel, BorderLayout.NORTH);
     }
 
-
     private static BufferedImage scale(BufferedImage imageToScale) {
         ResampleOp resizeOp = new ResampleOp(28, 28);
         resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
@@ -214,7 +213,6 @@ public class UI {
         return bimage;
     }
 
-
     private static double[] transformImageToOneDimensionalVector(BufferedImage img) {
 
         double[] imageGray = new double[28 * 28];
@@ -234,7 +232,6 @@ public class UI {
         }
         return imageGray;
     }
-
 
     private JFrame createMainFrame() {
         JFrame mainFrame = new JFrame();

@@ -1,4 +1,4 @@
-package ramo.klevis.cnn;
+package ramo.klevis;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,9 +11,9 @@ import java.io.IOException;
  */
 public class EdgeDetection {
 
-    private static final double[][] FILTER_VERTICAL = {{1, 0, -1}, {1, 0, -1}, {1, 0, -1}};
-    private static final double[][] FILTER_HORIZONTAL = {{1, 1, 1}, {0, 0, 0}, {-1, -1, -1}};
-    private static final double[][] FILTER_SOBEL = {{1, 0, -1}, {2, 0, -2}, {1, 0, -1}};
+    private static final double[][] FILTER_VERTICAL = { { 1, 0, -1 }, { 1, 0, -1 }, { 1, 0, -1 } };
+    private static final double[][] FILTER_HORIZONTAL = { { 1, 1, 1 }, { 0, 0, 0 }, { -1, -1, -1 } };
+    private static final double[][] FILTER_SOBEL = { { 1, 0, -1 }, { 2, 0, -2 }, { 1, 0, -1 } };
     private static final String INPUT_IMAGE = "resources/smallGirl.png";
     private static int count = 1;
 
@@ -27,7 +27,8 @@ public class EdgeDetection {
         BufferedImage bufferedImage = ImageIO.read(new File(INPUT_IMAGE));
 
         double[][][] image = transformImageToArray(bufferedImage);
-        double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image, FILTER_SOBEL);
+        double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image,
+                FILTER_SOBEL);
         reCreateOriginalImageFromMatrix(bufferedImage, finalConv);
     }
 
@@ -35,15 +36,16 @@ public class EdgeDetection {
         BufferedImage bufferedImage = ImageIO.read(new File(INPUT_IMAGE));
 
         double[][][] image = transformImageToArray(bufferedImage);
-        double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image, FILTER_HORIZONTAL);
+        double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image,
+                FILTER_HORIZONTAL);
         reCreateOriginalImageFromMatrix(bufferedImage, finalConv);
     }
-
 
     private static void detectVerticalEdges() throws IOException {
         BufferedImage bufferedImage = ImageIO.read(new File(INPUT_IMAGE));
         double[][][] image = transformImageToArray(bufferedImage);
-        double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image, FILTER_VERTICAL);
+        double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image,
+                FILTER_VERTICAL);
         reCreateOriginalImageFromMatrix(bufferedImage, finalConv);
     }
 
@@ -80,12 +82,13 @@ public class EdgeDetection {
         return image;
     }
 
-    private static void reCreateOriginalImageFromMatrix(BufferedImage originalImage, double[][] imageRGB) throws IOException {
-        BufferedImage writeBackImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+    private static void reCreateOriginalImageFromMatrix(BufferedImage originalImage, double[][] imageRGB)
+            throws IOException {
+        BufferedImage writeBackImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
         for (int i = 0; i < imageRGB.length; i++) {
             for (int j = 0; j < imageRGB[i].length; j++) {
-                Color color = new Color(fixOutOfRangeRGBValues(imageRGB[i][j]),
-                        fixOutOfRangeRGBValues(imageRGB[i][j]),
+                Color color = new Color(fixOutOfRangeRGBValues(imageRGB[i][j]), fixOutOfRangeRGBValues(imageRGB[i][j]),
                         fixOutOfRangeRGBValues(imageRGB[i][j]));
                 writeBackImage.setRGB(j, i, color.getRGB());
             }

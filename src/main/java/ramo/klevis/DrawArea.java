@@ -1,4 +1,4 @@
-package ramo.klevis.ui;
+package ramo.klevis;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -22,12 +22,11 @@ public class DrawArea extends JComponent {
     private Graphics2D g2;
     // Mouse coordinates
     private int currentX, currentY, oldX, oldY;
+
     public DrawArea() {
         setDoubleBuffered(false);
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-                "Please draw a digit",
-                TitledBorder.LEFT,
-                TitledBorder.TOP, sansSerifBold, Color.BLUE));
+        setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Please draw a digit",
+                TitledBorder.LEFT, TitledBorder.TOP, sansSerifBold, Color.BLUE));
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 // save coord x,y when mouse is pressed

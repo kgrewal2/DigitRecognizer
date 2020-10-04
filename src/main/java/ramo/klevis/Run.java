@@ -3,15 +3,12 @@ package ramo.klevis;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ramo.klevis.ui.ProgressBar;
-import ramo.klevis.ui.UI;
 
 import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -30,7 +27,7 @@ public class Run {
         ProgressBar progressBar = new ProgressBar(mainFrame, true);
         progressBar.showProgressBar("Collecting data this make take several seconds!");
         UI ui = new UI();
-        Executors.newCachedThreadPool().submit(()->{
+        Executors.newCachedThreadPool().submit(() -> {
             try {
                 ui.initUI();
             } finally {
@@ -39,7 +36,6 @@ public class Run {
             }
         });
     }
-
 
     private static void setHadoopHomeEnvironmentVariable() throws Exception {
         HashMap<String, String> hadoopEnvSetUp = new HashMap<>();
@@ -50,7 +46,8 @@ public class Run {
         Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
         env.clear();
         env.putAll(hadoopEnvSetUp);
-        Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
+        Field theCaseInsensitiveEnvironmentField = processEnvironmentClass
+                .getDeclaredField("theCaseInsensitiveEnvironment");
         theCaseInsensitiveEnvironmentField.setAccessible(true);
         Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
         cienv.clear();

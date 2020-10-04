@@ -1,4 +1,4 @@
-package ramo.klevis.data;
+package ramo.klevis;
 
 import org.apache.spark.ml.linalg.Vector;
 import org.apache.spark.ml.linalg.Vectors;
@@ -61,8 +61,6 @@ public class LabeledImage implements Serializable {
 
     @Override
     public String toString() {
-        return "LabeledImage{" +
-                "label=" + label +
-                '}';
+        return "LabeledImage{" + "label=" + label + '}';
     }
 }

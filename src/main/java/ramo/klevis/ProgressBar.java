@@ -1,4 +1,4 @@
-package ramo.klevis.ui;
+package ramo.klevis;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +42,6 @@ public class ProgressBar {
             mainFrame.repaint();
         });
     }
-
 
     private JProgressBar createProgressBar(JFrame mainFrame) {
         JProgressBar jProgressBar = new JProgressBar(JProgressBar.HORIZONTAL);
