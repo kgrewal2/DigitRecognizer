@@ -24,7 +24,8 @@ public class UI {
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
     private DrawArea drawArea;
     private JFrame mainFrame;
-    private JPanel drawAndDigitPredictionPanel, mainPanel, resultPanel;
+    private JPanel drawAndDigitPredictionPanel;
+    private JPanel resultPanel;
     private JSpinner testField, trainField;
 
     public UI() throws Exception {
@@ -35,113 +36,67 @@ public class UI {
         convolutionalNeuralNetwork.init();
     }
 
-    private static BufferedImage scaleBufferedImage(BufferedImage imageToScale) {
-        ResampleOp resizeOp = new ResampleOp(28, 28);
-        resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
-        BufferedImage filter = resizeOp.filter(imageToScale, null);
-        return filter;
-    }
-
-    private static BufferedImage toBufferedImage(Image img) {
-        BufferedImage bufferedImageWithTransparency = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics2D = bufferedImageWithTransparency.createGraphics();
-        graphics2D.drawImage(img, 0, 0, null);
-        graphics2D.dispose();
-        return bufferedImageWithTransparency;
-    }
-
-    private static double[] transformImageToOneDimensionalVector(BufferedImage image) {
-        double[] imageVector = new double[28 * 28];
-        int index = 0;
-        for (int i = 0; i < image.getWidth(); i++) {
-            for (int j = 0; j < image.getHeight(); j++) {
-                Color color = new Color(image.getRGB(j, i), true);
-                int red = (color.getRed());
-                int green = (color.getGreen());
-                int blue = (color.getBlue());
-                double colorValue = 255 - (red + green + blue) / 3d;
-                imageVector[index] = colorValue;
-                index++;
-            }
-        }
-        return imageVector;
-    }
-
     public void initUI() {
-        mainFrame = createMainFrame();
-        mainPanel = new JPanel();
+        mainFrame = getMainFrame();
+        JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        addTopPanel();
-        drawAndDigitPredictionPanel = new JPanel(new GridLayout());
-        addActionPanel();
-        addDrawAreaAndPredictionArea();
-        mainPanel.add(drawAndDigitPredictionPanel, BorderLayout.CENTER);
-        addSignature();
+        mainPanel.add(getTopPanel(), BorderLayout.NORTH);
+        mainPanel.add(getDrawAndDigitPredictionPanel(), BorderLayout.CENTER);
+        mainPanel.add(getSignatureLabel(), BorderLayout.SOUTH);
         mainFrame.add(mainPanel, BorderLayout.CENTER);
         mainFrame.setVisible(true);
     }
 
-    private void addActionPanel() {
-        JButton recognize = new JButton("Recognize Digit With Simple NN");
-        JButton recognizeCNN = new JButton("Recognize Digit With Conv NN");
-        recognize.addActionListener(e -> {
-            Image drawImage = drawArea.getImage();
-            BufferedImage sbi = toBufferedImage(drawImage);
-            Image scaled = scaleBufferedImage(sbi);
-            BufferedImage scaledBuffered = toBufferedImage(scaled);
-            double[] scaledPixels = transformImageToOneDimensionalVector(scaledBuffered);
-            LabeledImage labeledImage = new LabeledImage(0, scaledPixels);
-            LabeledImage predict = neuralNetwork.predict(labeledImage);
-            JLabel predictNumber = new JLabel("" + (int) predict.getLabel());
-            predictNumber.setForeground(Color.RED);
-            predictNumber.setFont(new Font("SansSerif", Font.BOLD, 128));
-            resultPanel.removeAll();
-            resultPanel.add(predictNumber);
-            resultPanel.updateUI();
-
-        });
-
-        recognizeCNN.addActionListener(e -> {
-            Image drawImage = drawArea.getImage();
-            BufferedImage sbi = toBufferedImage(drawImage);
-            Image scaled = scaleBufferedImage(sbi);
-            BufferedImage scaledBuffered = toBufferedImage(scaled);
-            double[] scaledPixels = transformImageToOneDimensionalVector(scaledBuffered);
-            LabeledImage labeledImage = new LabeledImage(0, scaledPixels);
-            int predict = convolutionalNeuralNetwork.predict(labeledImage);
-            JLabel predictNumber = new JLabel("" + predict);
-            predictNumber.setForeground(Color.RED);
-            predictNumber.setFont(new Font("SansSerif", Font.BOLD, 128));
-            resultPanel.removeAll();
-            resultPanel.add(predictNumber);
-            resultPanel.updateUI();
-
-        });
-        JButton clear = new JButton("Clear");
-        clear.addActionListener(e -> {
-            drawArea.setImage(null);
-            drawArea.repaint();
-            drawAndDigitPredictionPanel.updateUI();
-        });
-        JPanel actionPanel = new JPanel(new GridLayout(8, 1));
-        actionPanel.add(recognizeCNN);
-        actionPanel.add(recognize);
-        actionPanel.add(clear);
-        drawAndDigitPredictionPanel.add(actionPanel);
-    }
-
-    private void addDrawAreaAndPredictionArea() {
-
+    private JPanel getDrawAndDigitPredictionPanel() {
+        drawAndDigitPredictionPanel = new JPanel(new GridLayout());
+        drawAndDigitPredictionPanel.add(getActionPanel());
         drawArea = new DrawArea();
-
         drawAndDigitPredictionPanel.add(drawArea);
         resultPanel = new JPanel();
         resultPanel.setLayout(new GridBagLayout());
         drawAndDigitPredictionPanel.add(resultPanel);
+        return drawAndDigitPredictionPanel;
     }
 
-    private void addTopPanel() {
+    private JPanel getActionPanel() {
+        JPanel actionPanel = new JPanel(new GridLayout(8, 1));
+        actionPanel.add(getRecognizeButtonForSimpleNN());
+        actionPanel.add(getRecognizeButtonForCNN());
+        actionPanel.add(getClearButton());
+        return actionPanel;
+    }
+
+    private JButton getRecognizeButtonForSimpleNN() {
+        JButton button = new JButton("Recognize Digit With Simple NN");
+        Recognizer recognizer = Recognizer.getRecognizer();
+        button.addActionListener(e -> {
+            recognizer.recognize(drawArea, neuralNetwork, resultPanel, "NN");
+        });
+        return button;
+    }
+
+    private JButton getRecognizeButtonForCNN() {
+        JButton button = new JButton("Recognize Digit With Conv NN");
+        Recognizer recognizer = Recognizer.getRecognizer();
+        button.addActionListener(e -> {
+            recognizer.recognize(drawArea, convolutionalNeuralNetwork, resultPanel, "CNN");
+        });
+        return button;
+    }
+
+    private JButton getClearButton() {
+        JButton button = new JButton("Clear");
+        button.addActionListener(e -> {
+            drawArea.setImage(null);
+            drawArea.repaint();
+            drawAndDigitPredictionPanel.updateUI();
+        });
+        return button;
+    }
+
+    private JPanel getTopPanel() {
         JPanel topPanel = new JPanel(new FlowLayout());
+
         JButton trainNN = new JButton("Train NN");
         trainNN.addActionListener(e -> {
             int i = JOptionPane.showConfirmDialog(mainFrame, "Are you sure this may take some time to train?");
@@ -205,11 +160,11 @@ public class UI {
         testField = new JSpinner(modelTestSize);
         testField.setFont(sansSerifBold);
         topPanel.add(testField);
+        return topPanel;
 
-        mainPanel.add(topPanel, BorderLayout.NORTH);
     }
 
-    private JFrame createMainFrame() {
+    private JFrame getMainFrame() {
         JFrame mainFrame = new JFrame();
         mainFrame.setTitle("Digit Recognizer");
         mainFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -223,15 +178,14 @@ public class UI {
         });
         ImageIcon imageIcon = new ImageIcon("icon.png");
         mainFrame.setIconImage(imageIcon.getImage());
-
         return mainFrame;
     }
 
-    private void addSignature() {
+    private JLabel getSignatureLabel() {
         JLabel signature = new JLabel("ramok.tech", JLabel.HORIZONTAL);
         signature.setFont(new Font(Font.SANS_SERIF, Font.ITALIC, 20));
         signature.setForeground(Color.BLUE);
-        mainPanel.add(signature, BorderLayout.SOUTH);
+        return signature;
     }
 
 }
