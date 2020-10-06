@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class NeuralNetwork {
+public class NeuralNetwork implements Trainable, Predictor {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NeuralNetwork.class);
 
@@ -68,9 +68,8 @@ public class NeuralNetwork {
         sparkSession.sparkContext().setCheckpointDir("checkPoint");
     }
 
-    public LabeledImage predict(LabeledImage labeledImage) {
+    public int predict(LabeledImage labeledImage) {
         double predict = model.predict(labeledImage.getFeatures());
-        labeledImage.setLabel(predict);
-        return labeledImage;
+        return (int) Math.floor(predict);
     }
 }

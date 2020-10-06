@@ -8,10 +8,11 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Recognizer {
-    public static Recognizer getRecognizer(){
+    public static Recognizer getRecognizer() {
         return new Recognizer();
     }
-    public void recognize(DrawArea drawArea, Object neuralNetwork, JPanel resultPanel, String type){
+
+    public void recognize(DrawArea drawArea, Predictor neuralNetwork, JPanel resultPanel) {
         Image drawImage = drawArea.getImage();
         BufferedImage sbi = toBufferedImage(drawImage);
         Image scaled = scaleBufferedImage(sbi);
@@ -19,15 +20,10 @@ public class Recognizer {
         double[] scaledPixels = toOneDimensionalVector(scaledBuffered);
         LabeledImage labeledImage = new LabeledImage(0, scaledPixels);
         JLabel predictNumber = null;
-        if (type == "NN") {
-            LabeledImage predict = ((NeuralNetwork)neuralNetwork).predict(labeledImage);
-            predictNumber = new JLabel("" + (int) predict.getLabel());
-        }
-        // when type is "CNN"
-        else{
-            int predict = ((ConvolutionalNeuralNetwork)neuralNetwork).predict(labeledImage);
-            predictNumber = new JLabel("" + predict);
-        }
+
+        int predict = neuralNetwork.predict(labeledImage);
+        predictNumber = new JLabel("" + predict);
+
         predictNumber.setForeground(Color.RED);
         predictNumber.setFont(new Font("SansSerif", Font.BOLD, 128));
         resultPanel.removeAll();
@@ -36,7 +32,8 @@ public class Recognizer {
     }
 
     private static BufferedImage toBufferedImage(Image img) {
-        BufferedImage bufferedImageWithTransparency = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bufferedImageWithTransparency = new BufferedImage(img.getWidth(null), img.getHeight(null),
+                BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = bufferedImageWithTransparency.createGraphics();
         graphics2D.drawImage(img, 0, 0, null);
         graphics2D.dispose();

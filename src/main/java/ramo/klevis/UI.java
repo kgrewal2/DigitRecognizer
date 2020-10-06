@@ -70,7 +70,7 @@ public class UI {
         JButton button = new JButton("Recognize Digit With Simple NN");
         Recognizer recognizer = Recognizer.getRecognizer();
         button.addActionListener(e -> {
-            recognizer.recognize(drawArea, neuralNetwork, resultPanel, "NN");
+            recognizer.recognize(drawArea, neuralNetwork, resultPanel);
         });
         return button;
     }
@@ -79,7 +79,7 @@ public class UI {
         JButton button = new JButton("Recognize Digit With Conv NN");
         Recognizer recognizer = Recognizer.getRecognizer();
         button.addActionListener(e -> {
-            recognizer.recognize(drawArea, convolutionalNeuralNetwork, resultPanel, "CNN");
+            recognizer.recognize(drawArea, convolutionalNeuralNetwork, resultPanel);
         });
         return button;
     }
