@@ -3,32 +3,21 @@ package ramo.klevis;
 import com.mortennobel.imagescaling.ResampleFilters;
 import com.mortennobel.imagescaling.ResampleOp;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.function.Consumer;
 
 public class Recognizer {
-    public static Recognizer getRecognizer() {
-        return new Recognizer();
-    }
-
-    public void recognize(DrawArea drawArea, Predictor neuralNetwork, JPanel resultPanel) {
+    public void recognize(DrawArea drawArea, Predictor neuralNetwork, Consumer<Integer> uiCallback) {
         Image drawImage = drawArea.getImage();
         BufferedImage sbi = toBufferedImage(drawImage);
         Image scaled = scaleBufferedImage(sbi);
         BufferedImage scaledBuffered = toBufferedImage(scaled);
         double[] scaledPixels = toOneDimensionalVector(scaledBuffered);
         LabeledImage labeledImage = new LabeledImage(0, scaledPixels);
-        JLabel predictNumber = null;
 
         int predict = neuralNetwork.predict(labeledImage);
-        predictNumber = new JLabel("" + predict);
-
-        predictNumber.setForeground(Color.RED);
-        predictNumber.setFont(new Font("SansSerif", Font.BOLD, 128));
-        resultPanel.removeAll();
-        resultPanel.add(predictNumber);
-        resultPanel.updateUI();
+        uiCallback.accept(predict);
     }
 
     private static BufferedImage toBufferedImage(Image img) {

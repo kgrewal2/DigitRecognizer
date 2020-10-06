@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class UI {
 
@@ -27,6 +28,15 @@ public class UI {
     private JPanel drawAndDigitPredictionPanel;
     private JPanel resultPanel;
     private JSpinner testField, trainField;
+
+    private final Consumer<Integer> updateUI = prediction -> {
+        JLabel predictNumber = new JLabel("" + prediction);
+        predictNumber.setForeground(Color.RED);
+        predictNumber.setFont(new Font("SansSerif", Font.BOLD, 128));
+        resultPanel.removeAll();
+        resultPanel.add(predictNumber);
+        resultPanel.updateUI();
+    };
 
     public UI() throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -68,18 +78,16 @@ public class UI {
 
     private JButton getRecognizeButtonForSimpleNN() {
         JButton button = new JButton("Recognize Digit With Simple NN");
-        Recognizer recognizer = Recognizer.getRecognizer();
         button.addActionListener(e -> {
-            recognizer.recognize(drawArea, neuralNetwork, resultPanel);
+            new Recognizer().recognize(drawArea, neuralNetwork, updateUI);
         });
         return button;
     }
 
     private JButton getRecognizeButtonForCNN() {
         JButton button = new JButton("Recognize Digit With Conv NN");
-        Recognizer recognizer = Recognizer.getRecognizer();
         button.addActionListener(e -> {
-            recognizer.recognize(drawArea, convolutionalNeuralNetwork, resultPanel);
+            new Recognizer().recognize(drawArea, convolutionalNeuralNetwork, updateUI);
         });
         return button;
     }
