@@ -18,23 +18,14 @@ public class UI {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UI.class);
 
-    private static final int FRAME_WIDTH = 1200;
-    private static final int FRAME_HEIGHT = 628;
+    private static final int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
     private final NeuralNetwork neuralNetwork = new NeuralNetwork();
     private final ConvolutionalNeuralNetwork convolutionalNeuralNetwork = new ConvolutionalNeuralNetwork();
-
+    private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
     private DrawArea drawArea;
     private JFrame mainFrame;
-    private JPanel mainPanel;
-    private JPanel drawAndDigitPredictionPanel;
-    private SpinnerNumberModel modelTrainSize;
-    private JSpinner trainField;
-    private int TRAIN_SIZE = 30000;
-    private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
-    private int TEST_SIZE = 10000;
-    private SpinnerNumberModel modelTestSize;
-    private JSpinner testField;
-    private JPanel resultPanel;
+    private JPanel drawAndDigitPredictionPanel, mainPanel, resultPanel;
+    private JSpinner testField, trainField;
 
     public UI() throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -44,25 +35,50 @@ public class UI {
         convolutionalNeuralNetwork.init();
     }
 
-    public void initUI() {
-        // create main frame
-        mainFrame = createMainFrame();
+    private static BufferedImage scaleBufferedImage(BufferedImage imageToScale) {
+        ResampleOp resizeOp = new ResampleOp(28, 28);
+        resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
+        BufferedImage filter = resizeOp.filter(imageToScale, null);
+        return filter;
+    }
 
+    private static BufferedImage toBufferedImage(Image img) {
+        BufferedImage bufferedImageWithTransparency = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = bufferedImageWithTransparency.createGraphics();
+        graphics2D.drawImage(img, 0, 0, null);
+        graphics2D.dispose();
+        return bufferedImageWithTransparency;
+    }
+
+    private static double[] transformImageToOneDimensionalVector(BufferedImage image) {
+        double[] imageVector = new double[28 * 28];
+        int index = 0;
+        for (int i = 0; i < image.getWidth(); i++) {
+            for (int j = 0; j < image.getHeight(); j++) {
+                Color color = new Color(image.getRGB(j, i), true);
+                int red = (color.getRed());
+                int green = (color.getGreen());
+                int blue = (color.getBlue());
+                double colorValue = 255 - (red + green + blue) / 3d;
+                imageVector[index] = colorValue;
+                index++;
+            }
+        }
+        return imageVector;
+    }
+
+    public void initUI() {
+        mainFrame = createMainFrame();
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-
         addTopPanel();
-
         drawAndDigitPredictionPanel = new JPanel(new GridLayout());
         addActionPanel();
         addDrawAreaAndPredictionArea();
         mainPanel.add(drawAndDigitPredictionPanel, BorderLayout.CENTER);
-
         addSignature();
-
         mainFrame.add(mainPanel, BorderLayout.CENTER);
         mainFrame.setVisible(true);
-
     }
 
     private void addActionPanel() {
@@ -71,7 +87,7 @@ public class UI {
         recognize.addActionListener(e -> {
             Image drawImage = drawArea.getImage();
             BufferedImage sbi = toBufferedImage(drawImage);
-            Image scaled = scale(sbi);
+            Image scaled = scaleBufferedImage(sbi);
             BufferedImage scaledBuffered = toBufferedImage(scaled);
             double[] scaledPixels = transformImageToOneDimensionalVector(scaledBuffered);
             LabeledImage labeledImage = new LabeledImage(0, scaledPixels);
@@ -88,7 +104,7 @@ public class UI {
         recognizeCNN.addActionListener(e -> {
             Image drawImage = drawArea.getImage();
             BufferedImage sbi = toBufferedImage(drawImage);
-            Image scaled = scale(sbi);
+            Image scaled = scaleBufferedImage(sbi);
             BufferedImage scaledBuffered = toBufferedImage(scaled);
             double[] scaledPixels = transformImageToOneDimensionalVector(scaledBuffered);
             LabeledImage labeledImage = new LabeledImage(0, scaledPixels);
@@ -128,9 +144,7 @@ public class UI {
         JPanel topPanel = new JPanel(new FlowLayout());
         JButton trainNN = new JButton("Train NN");
         trainNN.addActionListener(e -> {
-
             int i = JOptionPane.showConfirmDialog(mainFrame, "Are you sure this may take some time to train?");
-
             if (i == JOptionPane.OK_OPTION) {
                 ProgressBar progressBar = new ProgressBar(mainFrame);
                 SwingUtilities
@@ -177,7 +191,8 @@ public class UI {
         JLabel tL = new JLabel("Training Data");
         tL.setFont(sansSerifBold);
         topPanel.add(tL);
-        modelTrainSize = new SpinnerNumberModel(TRAIN_SIZE, 10000, 60000, 1000);
+        int TRAIN_SIZE = 30000;
+        SpinnerNumberModel modelTrainSize = new SpinnerNumberModel(TRAIN_SIZE, 10000, 60000, 1000);
         trainField = new JSpinner(modelTrainSize);
         trainField.setFont(sansSerifBold);
         topPanel.add(trainField);
@@ -185,52 +200,13 @@ public class UI {
         JLabel ttL = new JLabel("Test Data");
         ttL.setFont(sansSerifBold);
         topPanel.add(ttL);
-        modelTestSize = new SpinnerNumberModel(TEST_SIZE, 1000, 10000, 500);
+        int TEST_SIZE = 10000;
+        SpinnerNumberModel modelTestSize = new SpinnerNumberModel(TEST_SIZE, 1000, 10000, 500);
         testField = new JSpinner(modelTestSize);
         testField.setFont(sansSerifBold);
         topPanel.add(testField);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
-    }
-
-    private static BufferedImage scale(BufferedImage imageToScale) {
-        ResampleOp resizeOp = new ResampleOp(28, 28);
-        resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
-        BufferedImage filter = resizeOp.filter(imageToScale, null);
-        return filter;
-    }
-
-    private static BufferedImage toBufferedImage(Image img) {
-        // Create a buffered image with transparency
-        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        // Draw the image on to the buffered image
-        Graphics2D bGr = bimage.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        // Return the buffered image
-        return bimage;
-    }
-
-    private static double[] transformImageToOneDimensionalVector(BufferedImage img) {
-
-        double[] imageGray = new double[28 * 28];
-        int w = img.getWidth();
-        int h = img.getHeight();
-        int index = 0;
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                Color color = new Color(img.getRGB(j, i), true);
-                int red = (color.getRed());
-                int green = (color.getGreen());
-                int blue = (color.getBlue());
-                double v = 255 - (red + green + blue) / 3d;
-                imageGray[index] = v;
-                index++;
-            }
-        }
-        return imageGray;
     }
 
     private JFrame createMainFrame() {
