@@ -12,21 +12,20 @@ import org.slf4j.LoggerFactory;
  */
 public class AccuracyCalculator implements ScoreCalculator<MultiLayerNetwork> {
 
-    private static final Logger log = LoggerFactory.getLogger(AccuracyCalculator.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccuracyCalculator.class);
     private final MnistDataSetIterator dataSetIterator;
+    int i = 0;
 
     public AccuracyCalculator(MnistDataSetIterator dataSetIterator) {
         this.dataSetIterator = dataSetIterator;
     }
 
-    int i = 0;
-
     @Override
     public double calculateScore(MultiLayerNetwork network) {
         Evaluation evaluate = network.evaluate(dataSetIterator);
         double accuracy = evaluate.accuracy();
-        log.error("Accuracy " + i++ + " " + accuracy);
+        LOGGER.error("Accuracy " + i + " " + accuracy);
+        i++;
         return 1 - evaluate.accuracy();
     }
 }
