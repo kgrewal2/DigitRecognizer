@@ -18,34 +18,16 @@ public class EdgeDetection {
     private static int count = 1;
 
     public static void main(String[] args) throws IOException {
-        detectVerticalEdges();
-        detectHorizontalEdges();
-        detectSobelEdges();
+        detectEdgeWithFilter(FILTER_VERTICAL);
+        detectEdgeWithFilter(FILTER_HORIZONTAL);
+        detectEdgeWithFilter(FILTER_SOBEL);
     }
 
-    private static void detectSobelEdges() throws IOException {
-        BufferedImage bufferedImage = ImageIO.read(new File(INPUT_IMAGE));
-
-        double[][][] image = transformImageToArray(bufferedImage);
-        double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image,
-                FILTER_SOBEL);
-        reCreateOriginalImageFromMatrix(bufferedImage, finalConv);
-    }
-
-    private static void detectHorizontalEdges() throws IOException {
-        BufferedImage bufferedImage = ImageIO.read(new File(INPUT_IMAGE));
-
-        double[][][] image = transformImageToArray(bufferedImage);
-        double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image,
-                FILTER_HORIZONTAL);
-        reCreateOriginalImageFromMatrix(bufferedImage, finalConv);
-    }
-
-    private static void detectVerticalEdges() throws IOException {
+    private static void detectEdgeWithFilter(double[][] filter) throws IOException{
         BufferedImage bufferedImage = ImageIO.read(new File(INPUT_IMAGE));
         double[][][] image = transformImageToArray(bufferedImage);
         double[][] finalConv = applyConvolution(bufferedImage.getWidth(), bufferedImage.getHeight(), image,
-                FILTER_VERTICAL);
+                filter);
         reCreateOriginalImageFromMatrix(bufferedImage, finalConv);
     }
 
