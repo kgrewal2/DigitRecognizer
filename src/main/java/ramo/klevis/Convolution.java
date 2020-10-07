@@ -12,7 +12,9 @@ public class Convolution extends Thread {
 
     /**
      * Takes an image (grey-levels) and a kernel and a position, applies the
-     * convolution at that position and returns the new pixel value.
+     * convolution at that position
+     *
+     * @return the new pixel value.
      */
     public static double singlePixelConvolution(double[][] image, int x, int y, double[][] kernel, int kernelWidth,
                                                 int kernelHeight) {
@@ -51,8 +53,9 @@ public class Convolution extends Thread {
 
     /**
      * Takes a 2D array of grey-levels and a kernel, applies the convolution over
-     * the area of the image specified by width and height and returns a part of the
-     * final image.
+     * the area of the image specified by width and height
+     *
+     * @return Part of the final image.
      */
     public static double[][] areaConvolutionWithPadding(double[][] image, int width, int height, double[][] kernel,
                                                         int kernelWidth, int kernelHeight) {
