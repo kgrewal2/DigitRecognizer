@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by agibsonccc on 9/16/15.
  */
-public class ConvolutionalNeuralNetwork {
+public class ConvolutionalNeuralNetwork implements Model, Initialized {
 
         private static final String OUT_DIR = "resources/cnnCurrentTrainingModels";
         private static final String TRAINED_MODEL_FILE = "resources/cnnTrainedModels/bestModel.bin";
