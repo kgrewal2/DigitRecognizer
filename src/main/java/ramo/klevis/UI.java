@@ -1,7 +1,5 @@
 package ramo.klevis;
 
-import com.mortennobel.imagescaling.ResampleFilters;
-import com.mortennobel.imagescaling.ResampleOp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +8,6 @@ import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -79,7 +76,7 @@ public class UI {
     private JButton getRecognizeButtonForSimpleNN() {
         JButton button = new JButton("Recognize Digit With Simple NN");
         button.addActionListener(e -> {
-            new Recognizer().recognize(drawArea, neuralNetwork, updateUI);
+            new Recognizer().recognize(drawArea.getImage(), neuralNetwork, updateUI);
         });
         return button;
     }
@@ -87,7 +84,7 @@ public class UI {
     private JButton getRecognizeButtonForCNN() {
         JButton button = new JButton("Recognize Digit With Conv NN");
         button.addActionListener(e -> {
-            new Recognizer().recognize(drawArea, convolutionalNeuralNetwork, updateUI);
+            new Recognizer().recognize(drawArea.getImage(), convolutionalNeuralNetwork, updateUI);
         });
         return button;
     }
