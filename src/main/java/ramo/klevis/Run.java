@@ -24,9 +24,11 @@ public class Run {
 
         LOGGER.info("Application is starting ... ");
 
+        ModelAdapter model = new ModelAdapter();
+
         ProgressBar progressBar = new ProgressBar(mainFrame, true);
         progressBar.showProgressBar("Collecting data this make take several seconds!");
-        UI ui = new UI();
+        UI ui = new UI(model::train, model::predict);
         Executors.newCachedThreadPool().submit(() -> {
             try {
                 ui.initUI();

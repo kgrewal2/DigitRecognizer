@@ -8,23 +8,23 @@ import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
+import java.util.function.*;
 
 public class UI {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UI.class);
 
     private static final int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
-    private final NeuralNetwork neuralNetwork = new NeuralNetwork();
-    private final ConvolutionalNeuralNetwork convolutionalNeuralNetwork = new ConvolutionalNeuralNetwork();
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
     private DrawArea drawArea;
     private JFrame mainFrame;
     private JPanel drawAndDigitPredictionPanel;
     private JPanel resultPanel;
     private JSpinner testField, trainField;
+
+    private Function3<ModelType, Integer, Integer, Boolean> trainCallback;
+    private Function3<ModelType, Image, Consumer<Integer>, Boolean> predictCallback;
 
     private final Consumer<Integer> updateUI = prediction -> {
         JLabel predictNumber = new JLabel("" + prediction);
@@ -35,12 +35,14 @@ public class UI {
         resultPanel.updateUI();
     };
 
-    public UI() throws Exception {
+    public UI(Function3<ModelType, Integer, Integer, Boolean> train,
+            Function3<ModelType, Image, Consumer<Integer>, Boolean> predict) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 18)));
         UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 18)));
-        neuralNetwork.init();
-        convolutionalNeuralNetwork.init();
+
+        this.trainCallback = train;
+        this.predictCallback = predict;
     }
 
     public void initUI() {
@@ -76,7 +78,7 @@ public class UI {
     private JButton getRecognizeButtonForSimpleNN() {
         JButton button = new JButton("Recognize Digit With Simple NN");
         button.addActionListener(e -> {
-            new Recognizer().recognize(drawArea.getImage(), neuralNetwork, updateUI);
+            this.predictCallback.apply(ModelType.NEURAL, drawArea.getImage(), updateUI);
         });
         return button;
     }
@@ -84,7 +86,7 @@ public class UI {
     private JButton getRecognizeButtonForCNN() {
         JButton button = new JButton("Recognize Digit With Conv NN");
         button.addActionListener(e -> {
-            new Recognizer().recognize(drawArea.getImage(), convolutionalNeuralNetwork, updateUI);
+            this.predictCallback.apply(ModelType.CONVOLUTIONAL, drawArea.getImage(), updateUI);
         });
         return button;
     }
@@ -112,7 +114,8 @@ public class UI {
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of train Neural Network");
-                        neuralNetwork.train((Integer) trainField.getValue(), (Integer) testField.getValue());
+                        this.trainCallback.apply(ModelType.NEURAL, (Integer) trainField.getValue(),
+                                (Integer) testField.getValue());
                         LOGGER.info("End of train Neural Network");
                     } finally {
                         progressBar.setVisible(false);
@@ -133,12 +136,9 @@ public class UI {
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of train Convolutional Neural Network");
-                        convolutionalNeuralNetwork.train((Integer) trainField.getValue(),
+                        this.trainCallback.apply(ModelType.CONVOLUTIONAL, (Integer) trainField.getValue(),
                                 (Integer) testField.getValue());
                         LOGGER.info("End of train Convolutional Neural Network");
-                    } catch (IOException e1) {
-                        LOGGER.error("CNN not trained " + e1);
-                        throw new RuntimeException(e1);
                     } finally {
                         progressBar.setVisible(false);
                     }
