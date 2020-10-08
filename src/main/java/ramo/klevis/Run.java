@@ -26,6 +26,8 @@ public class Run {
 
         ModelAdapter model = new ModelAdapter();
 
+        // TODO: Commented to run application.
+//        setHadoopHomeEnvironmentVariable();
         ProgressBar progressBar = new ProgressBar(mainFrame, true);
         progressBar.showProgressBar("Collecting data this make take several seconds!");
         UI ui = new UI(model::train, model::predict);

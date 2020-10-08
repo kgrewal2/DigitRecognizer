@@ -3,8 +3,8 @@ package ramo.klevis;
 import java.io.IOException;
 
 public class ModelFactory {
-    private static NeuralNetwork nn = null;
-    private static ConvolutionalNeuralNetwork cnn = null;
+    private static NeuralNetworkSimple nn = null;
+    private static NeuralNetworkConvolutional cnn = null;
 
     public static Model makeModel(ModelType type) throws IOException {
         switch (type) {
@@ -12,8 +12,8 @@ public class ModelFactory {
                 if (nn != null) {
                     return nn;
                 }
-
-                NeuralNetwork network = new NeuralNetwork();
+                // TODO: 2 lines below can be turned into one line
+                NeuralNetworkSimple network = new NeuralNetworkSimple();
                 nn = network;
                 nn.init();
 
@@ -23,11 +23,10 @@ public class ModelFactory {
                 if (cnn != null) {
                     return cnn;
                 }
-
-                ConvolutionalNeuralNetwork network = new ConvolutionalNeuralNetwork();
+                // TODO: 2 lines below can be turned into one line
+                NeuralNetworkConvolutional network = new NeuralNetworkConvolutional();
                 cnn = network;
                 cnn.init();
-
                 return cnn;
             }
             default:

@@ -8,9 +8,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-import static ramo.klevis.IdxReader.INPUT_IMAGE_PATH;
-import static ramo.klevis.IdxReader.INPUT_LABEL_PATH;
+import static org.junit.Assert.assertEquals;
+import static ramo.klevis.IdxReader.INPUT_IMAGE_PATH_TRAIN_DATA;
+import static ramo.klevis.IdxReader.INPUT_LABEL_PATH_TRAIN_DATA;
 
 /**
  * @author (created on 12 / 7 / 2017).
@@ -27,8 +27,8 @@ public class IdxReaderTest {
      */
     @Test
     public void testmagicNumbersForBigDataset() {
-        try (FileInputStream inImage = new FileInputStream(INPUT_IMAGE_PATH);
-                FileInputStream inLabel = new FileInputStream(INPUT_LABEL_PATH)) {
+        try (FileInputStream inImage = new FileInputStream(INPUT_IMAGE_PATH_TRAIN_DATA);
+             FileInputStream inLabel = new FileInputStream(INPUT_LABEL_PATH_TRAIN_DATA)) {
 
             // ==========================================================================================================
             // it reads the next byte of data (8 bits) then put them to left side of an int
@@ -44,10 +44,10 @@ public class IdxReaderTest {
             int numberOfColumns = (inImage.read() << 24) | (inImage.read() << 16) | (inImage.read() << 8)
                     | (inImage.read());
 
-            assertTrue(magicNumberImages == 2051);
-            assertTrue(numberOfImages == 60000);
-            assertTrue(numberOfRows == 28);
-            assertTrue(numberOfColumns == 28);
+            assertEquals(2051, magicNumberImages);
+            assertEquals(60000, numberOfImages);
+            assertEquals(28, numberOfRows);
+            assertEquals(28, numberOfColumns);
 
             // the same as inImage.skip(16);
             System.out.println("Available bytes after read: " + inImage.available());// 47040000
@@ -61,8 +61,8 @@ public class IdxReaderTest {
                     | (inLabel.read());
             int numberOfLabels = (inLabel.read() << 24) | (inLabel.read() << 16) | (inLabel.read() << 8)
                     | (inLabel.read());
-            assertTrue(magicNumberLabels == 2049);
-            assertTrue(numberOfLabels == 60000);
+            assertEquals(2049, magicNumberLabels);
+            assertEquals(60000, numberOfLabels);
 
             System.out.println("Available bytes after read: " + inLabel.available()); // 60000
             // the same as inLabel.skip(8);

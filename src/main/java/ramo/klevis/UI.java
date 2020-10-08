@@ -77,17 +77,13 @@ public class UI {
 
     private JButton getRecognizeButtonForSimpleNN() {
         JButton button = new JButton("Recognize Digit With Simple NN");
-        button.addActionListener(e -> {
-            this.predictCallback.apply(ModelType.NEURAL, drawArea.getImage(), updateUI);
-        });
+        button.addActionListener(e -> this.predictCallback.apply(ModelType.NEURAL, drawArea.getImage(), updateUI));
         return button;
     }
 
     private JButton getRecognizeButtonForCNN() {
         JButton button = new JButton("Recognize Digit With Conv NN");
-        button.addActionListener(e -> {
-            this.predictCallback.apply(ModelType.CONVOLUTIONAL, drawArea.getImage(), updateUI);
-        });
+        button.addActionListener(e -> this.predictCallback.apply(ModelType.CONVOLUTIONAL, drawArea.getImage(), updateUI));
         return button;
     }
 

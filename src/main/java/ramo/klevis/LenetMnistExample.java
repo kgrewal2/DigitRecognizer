@@ -132,11 +132,8 @@ public class LenetMnistExample {
             log.info("Evaluate model....");
             Evaluation eval = model.evaluate(mnistTest);
             if (eval.accuracy() >= 0.9901) {
-                File locationToSave = new File(ouput); // Where to save the network. Note: the file is in .zip format -
-                                                       // can be opened externally
-                boolean saveUpdater = true; // Updater: i.e., the state for Momentum, RMSProp, Adagrad etc. Save this if
-                                            // you want to train your network more in the future
-                ModelSerializer.writeModel(model, locationToSave, saveUpdater);
+                File saveLocation = new File(ouput);
+                ModelSerializer.writeModel(model, saveLocation, true);
                 log.info("found ");
                 break;
             }

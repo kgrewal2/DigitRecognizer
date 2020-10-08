@@ -42,6 +42,7 @@ public class EdgeDetection {
 
     private static double[][] applyConvolution(int width, int height, double[][][] image, double[][] filter) {
         Convolution convolution = new Convolution();
+        // TODO: wrong params are passed. height -to-> width. width -to-> height.
         double[][] redConvolvedImage = convolution.applyConvolutionWithPaddingIterative(image[0], height, width, filter, 3, 3, 1);
         double[][] greenConvolvedImage = convolution.applyConvolutionWithPaddingIterative(image[1], height, width, filter, 3, 3, 1);
         double[][] blueConvolvedImage = convolution.applyConvolutionWithPaddingIterative(image[2], height, width, filter, 3, 3, 1);
@@ -71,17 +72,17 @@ public class EdgeDetection {
 
     private static void recreateOriginalImageFromMatrix(BufferedImage originalImage, double[][] imageRGB)
             throws IOException {
-        BufferedImage writeBackImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(),
+        BufferedImage outputImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(),
                 BufferedImage.TYPE_INT_RGB);
         for (int i = 0; i < imageRGB.length; i++) {
             for (int j = 0; j < imageRGB[i].length; j++) {
                 Color color = new Color(fixOutOfRangeRGBValues(imageRGB[i][j]), fixOutOfRangeRGBValues(imageRGB[i][j]),
                         fixOutOfRangeRGBValues(imageRGB[i][j]));
-                writeBackImage.setRGB(j, i, color.getRGB());
+                outputImage.setRGB(j, i, color.getRGB());
             }
         }
         File outputFile = new File("edges" + count++ + ".png");
-        ImageIO.write(writeBackImage, "png", outputFile);
+        ImageIO.write(outputImage, "png", outputFile);
     }
 
     private static int fixOutOfRangeRGBValues(double value) {
