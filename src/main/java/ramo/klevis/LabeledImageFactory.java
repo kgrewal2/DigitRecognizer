@@ -46,7 +46,6 @@ public class LabeledImageFactory {
     private static BufferedImage scaleBufferedImage(BufferedImage imageToScale) {
         ResampleOp resizeOp = new ResampleOp(28, 28);
         resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
-        BufferedImage filter = resizeOp.filter(imageToScale, null);
-        return filter;
+        return resizeOp.filter(imageToScale, null);
     }
 }

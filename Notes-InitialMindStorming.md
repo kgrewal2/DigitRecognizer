@@ -4,7 +4,7 @@
 
 1. We draw the digit.
 2. Click on one of the buttons. (Simple and CNN)
-3. Result is displayed.
+3. Display result.
 
 ### Goals
 
@@ -18,5 +18,5 @@
 6. A central interface (`Recognizer`) between UI and (SimpleNN/CNN)
     Recognizer will be mix of Strategy+Factory
     [Link to chat](https://fse-engineering-asu.slack.com/archives/G01BU42BB1Q/p1601937394055600?thread_ts=1601934777.024900&cid=G01BU42BB1Q)
-7. Refactor detectHorizontalEdges detectSobelEdges and detectVerticalEdges with or without pattern. (Mention the justification for whatever is done in the final document)
+7. Refactor detectHorizontalEdges detectSobelEdges and detectVerticalEdges with or without the pattern. (Mention the justification for whatever is done in the final document)
 

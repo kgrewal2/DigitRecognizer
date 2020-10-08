@@ -1,7 +1,7 @@
 package ramo.klevis;
 
-/**
- * Created by klevis.ramo on 11/27/2017.
+/*
+  Created by klevis.ramo on 11/27/2017.
  */
 
 import org.apache.spark.ml.classification.MultilayerPerceptronClassificationModel;
@@ -13,17 +13,16 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 
-public class NeuralNetwork implements Model, Initialized {
+public class NeuralNetworkSimple implements AIModel, Initialized {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(NeuralNetwork.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(NeuralNetworkSimple.class);
 
     private SparkSession sparkSession;
     private MultilayerPerceptronClassificationModel model;
 
-    public void init() throws IOException {
+    public void init() {
         initSparkSession();
         if (model == null) {
             LOGGER.info("Loading the Neural Network from saved model ... ");
