@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class NeuralNetworkSimple implements Model, Initialized {
+public class NeuralNetworkSimple implements AIModel, Initialized {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NeuralNetworkSimple.class);
 

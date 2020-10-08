@@ -1,5 +1,5 @@
 package ramo.klevis;
 
-public enum ModelType {
+public enum AIModelType {
     NEURAL, CONVOLUTIONAL
 }

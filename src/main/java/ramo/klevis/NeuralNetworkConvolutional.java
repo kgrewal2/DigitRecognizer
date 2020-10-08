@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by agibsonccc on 9/16/15.
  */
-public class NeuralNetworkConvolutional implements Model, Initialized {
+public class NeuralNetworkConvolutional implements AIModel, Initialized {
 
         private static final String OUT_DIR = "resources/cnnCurrentTrainingModels";
         private static final String TRAINED_MODEL_FILE = "resources/cnnTrainedModels/bestModel.bin";
@@ -62,11 +62,12 @@ public class NeuralNetworkConvolutional implements Model, Initialized {
                 int numTrainingIterations = 1;
                 int seed = 123;
 
-                MnistDataSetIterator mnistTrain = new MnistDataSetIterator(testBatchSize, trainDataSize, false, true, true,
-                                12345);
+                MnistDataSetIterator mnistTrain = new MnistDataSetIterator(testBatchSize, trainDataSize, false, true,
+                                true, 12345);
 
-                MultiLayerConfiguration multiLayerConfiguration = new NeuralNetConfiguration.Builder().seed(seed).iterations(numTrainingIterations)
-                                .regularization(false).learningRate(0.01).weightInit(WeightInit.XAVIER)
+                MultiLayerConfiguration multiLayerConfiguration = new NeuralNetConfiguration.Builder().seed(seed)
+                                .iterations(numTrainingIterations).regularization(false).learningRate(0.01)
+                                .weightInit(WeightInit.XAVIER)
                                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                                 .updater(Updater.NESTEROVS).list()
                                 .layer(0, new ConvolutionLayer.Builder(5, 5).nIn(numInputChannels).stride(1, 1).nOut(20)
@@ -94,7 +95,8 @@ public class NeuralNetworkConvolutional implements Model, Initialized {
                                                 testDataSize, false, false, true, 12345)))
                                 .evaluateEveryNEpochs(1).modelSaver(new LocalFileModelSaver(OUT_DIR)).build();
 
-                EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(earlyStoppingConfig, multiLayerConfiguration, mnistTrain);
+                EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(earlyStoppingConfig, multiLayerConfiguration,
+                                mnistTrain);
 
                 EarlyStoppingResult result = trainer.fit();
 

@@ -5,11 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+
+import java.awt.Image;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 /**
  * Created by klevis.ramo on 11/24/2017.
@@ -24,13 +27,17 @@ public class Run {
 
         LOGGER.info("Application is starting ... ");
 
-        ModelAdapter model = new ModelAdapter();
+        Model model = new Model();
+        ModelAdapterFactory adapterFactory = new ModelAdapterFactory();
+        Function3<AIModelType, Integer, Integer, Boolean> trainAdapter = adapterFactory.makeTrainAdapter(model);
+        Function3<AIModelType, Image, Consumer<Integer>, Boolean> predictAdapter = adapterFactory
+                .makePredictAdapter(model);
 
         // TODO: Commented to run application.
-//        setHadoopHomeEnvironmentVariable();
+        // setHadoopHomeEnvironmentVariable();
         ProgressBar progressBar = new ProgressBar(mainFrame, true);
         progressBar.showProgressBar("Collecting data this make take several seconds!");
-        UI ui = new UI(model::train, model::predict);
+        UI ui = new UI(trainAdapter, predictAdapter);
         Executors.newCachedThreadPool().submit(() -> {
             try {
                 ui.initUI();
