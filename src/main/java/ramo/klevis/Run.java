@@ -28,7 +28,8 @@ public class Run {
         LOGGER.info("Application is starting ... ");
 
         Model model = new Model();
-        ModelAdapterFactory adapterFactory = new ModelAdapterFactory();
+        ModelAdapterFactory adapterFactory = new ModelAdapterFactory(
+                new MemoizedAIModelFactory(new NeuralNetworkFactory()));
         Function3<AIModelType, Integer, Integer, Boolean> trainAdapter = adapterFactory.makeTrainAdapter(model);
         Function3<AIModelType, Image, Consumer<Integer>, Boolean> predictAdapter = adapterFactory
                 .makePredictAdapter(model);

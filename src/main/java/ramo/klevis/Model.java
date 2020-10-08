@@ -1,7 +1,6 @@
 package ramo.klevis;
 
 import java.io.IOException;
-import java.util.function.*;
 
 public class Model {
     void train(Trainable trainable, Integer train, Integer test) {
