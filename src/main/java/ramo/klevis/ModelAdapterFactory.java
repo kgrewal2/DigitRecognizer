@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class ModelAdapterFactory {
-    private MemoizedAIModelFactory factory;
+    protected AIModelFactory factory;
 
-    public ModelAdapterFactory() throws IOException {
-        this.factory = new MemoizedAIModelFactory(new NeuralNetworkFactory());
+    public ModelAdapterFactory(AIModelFactory factory) throws IOException {
+        this.factory = factory;
     }
 
     public Function3<AIModelType, Integer, Integer, Boolean> makeTrainAdapter(Model model) {
@@ -16,10 +16,12 @@ public class ModelAdapterFactory {
             try {
                 Trainable trainable = this.factory.makeAIModel(type);
                 model.train(trainable, train, test);
+
+                return true;
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
-            return true;
         };
     }
 
@@ -31,10 +33,11 @@ public class ModelAdapterFactory {
                 int predict = model.predict(predictor, image);
 
                 uiCallback.accept(predict);
+                return true;
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
-            return true;
         };
     }
 }
