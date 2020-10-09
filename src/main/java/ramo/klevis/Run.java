@@ -21,11 +21,11 @@ public class Run {
 
         LOGGER.info("Application is starting ... ");
 
-        NeuralNetworkAdapter adapterFactory = new NeuralNetworkAdapter();
+        NeuralNetworkFacade neuralNetworkFacade = new NeuralNetworkFacade();
 
         ProgressBar progressBar = new ProgressBar(mainFrame, true);
         progressBar.showProgressBar("Collecting data this make take several seconds!");
-        UI ui = new UI(adapterFactory);
+        UI ui = new UI(neuralNetworkFacade);
         Executors.newCachedThreadPool().submit(() -> {
             try {
                 ui.initUI();

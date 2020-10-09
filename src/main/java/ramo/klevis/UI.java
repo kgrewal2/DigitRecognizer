@@ -22,7 +22,7 @@ public class UI {
     private JPanel drawAndDigitPredictionPanel;
     private JPanel resultPanel;
     private JSpinner testField, trainField;
-    private NeuralNetworkAdapter neuralNetworkAdapter;
+    private NeuralNetworkFacade neuralNetworkFacade;
 
     private final Consumer<Integer> updateUI = prediction -> {
         JLabel predictNumber = new JLabel("" + prediction);
@@ -33,12 +33,12 @@ public class UI {
         resultPanel.updateUI();
     };
 
-    public UI(NeuralNetworkAdapter neuralNetworkAdapter) throws Exception {
+    public UI(NeuralNetworkFacade neuralNetworkFacade) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 18)));
         UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 18)));
 
-        this.neuralNetworkAdapter = neuralNetworkAdapter;
+        this.neuralNetworkFacade = neuralNetworkFacade;
     }
 
     public void initUI() {
@@ -73,14 +73,14 @@ public class UI {
 
     private JButton getRecognizeButtonForSimpleNN() {
         JButton button = new JButton("Recognize Digit With Simple NN");
-        button.addActionListener(e -> this.neuralNetworkAdapter.test(NeuralNetworkType.SIMPLE, drawArea.getImage(), updateUI));
+        button.addActionListener(e -> this.neuralNetworkFacade.test(NeuralNetworkType.SIMPLE, drawArea.getImage(), updateUI));
         return button;
     }
 
     private JButton getRecognizeButtonForCNN() {
         JButton button = new JButton("Recognize Digit With Conv NN");
         button.addActionListener(
-                e -> this.neuralNetworkAdapter.test(NeuralNetworkType.CONVOLUTIONAL, drawArea.getImage(), updateUI));
+                e -> this.neuralNetworkFacade.test(NeuralNetworkType.CONVOLUTIONAL, drawArea.getImage(), updateUI));
         return button;
     }
 
@@ -107,7 +107,7 @@ public class UI {
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of train Neural Network");
-                        this.neuralNetworkAdapter.train(NeuralNetworkType.SIMPLE, (Integer) trainField.getValue(),
+                        this.neuralNetworkFacade.train(NeuralNetworkType.SIMPLE, (Integer) trainField.getValue(),
                                 (Integer) testField.getValue());
                         LOGGER.info("End of train Neural Network");
                     } finally {
@@ -129,7 +129,7 @@ public class UI {
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of train Convolutional Neural Network");
-                        this.neuralNetworkAdapter.train(NeuralNetworkType.CONVOLUTIONAL, (Integer) trainField.getValue(),
+                        this.neuralNetworkFacade.train(NeuralNetworkType.CONVOLUTIONAL, (Integer) trainField.getValue(),
                                 (Integer) testField.getValue());
                         LOGGER.info("End of train Convolutional Neural Network");
                     } finally {

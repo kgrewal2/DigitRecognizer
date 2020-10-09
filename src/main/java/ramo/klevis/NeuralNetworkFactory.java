@@ -1,8 +1,6 @@
 package ramo.klevis;
 
-import java.io.*;
-
-public class NeuralNetworkFactory{
+public class NeuralNetworkFactory {
     public NeuralNetwork create(NeuralNetworkType type) {
         switch (type) {
             case SIMPLE: {
@@ -12,7 +10,7 @@ public class NeuralNetworkFactory{
                 return new NeuralNetworkConvolutional();
             }
             default:
-                return null;
+                throw new IllegalArgumentException("Invalid Type: " + type.toString());
         }
     }
 }

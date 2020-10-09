@@ -4,10 +4,10 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-public class NeuralNetworkAdapter {
-    private NeuralNetworkCache neuralNetworkCache;
+public class NeuralNetworkFacade {
+    private final NeuralNetworkCache neuralNetworkCache;
 
-    public NeuralNetworkAdapter() throws IOException {
+    public NeuralNetworkFacade() throws IOException {
         this.neuralNetworkCache = new NeuralNetworkCache();
     }
 
@@ -30,7 +30,6 @@ public class NeuralNetworkAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return true;
     }
 }
