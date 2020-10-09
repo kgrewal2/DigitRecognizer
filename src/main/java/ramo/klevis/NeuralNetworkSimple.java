@@ -17,7 +17,7 @@ import java.util.List;
  */
 
 
-public class NeuralNetworkSimple implements Initialized, NeuralNetwork {
+public class NeuralNetworkSimple implements NeuralNetwork {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NeuralNetworkSimple.class);
 

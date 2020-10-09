@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class NeuralNetworkCache {
-    private Map<NeuralNetworkType, NeuralNetwork> cachedNetworks;
+    private final Map<NeuralNetworkType, NeuralNetwork> cachedNetworks;
     protected NeuralNetworkFactory factory;
 
     public NeuralNetworkCache() throws IOException {
