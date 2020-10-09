@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.Executors;
-import java.util.function.*;
+import java.util.function.Consumer;
 
 public class UI {
 
@@ -17,14 +17,69 @@ public class UI {
 
     private static final int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
+    int TRAIN_SIZE = 30000, TEST_SIZE = 10000;
     private DrawArea drawArea;
     private JFrame mainFrame;
-    private JPanel drawAndDigitPredictionPanel;
+    private JPanel drawAndResultPanel;
     private JPanel resultPanel;
-    private JSpinner testField, trainField;
 
-    private Function3<AIModelType, Integer, Integer, Boolean> trainCallback;
-    private Function3<AIModelType, Image, Consumer<Integer>, Boolean> predictCallback;
+    private JSpinner testDataSpinner, trainDataSpinner;
+    private NeuralNetworkFacade neuralNetworkFacade;
+    private ProgressBar progressBar;
+    private JFrame progressBarFrame;
+
+    public UI() {
+    }
+
+    public static void setUIManagerSettings() {
+        // TURN ON ANTIALIASING
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("swing.aatext", "true");
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
+
+        UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
+        UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
+    }
+
+    public void setFacade(NeuralNetworkFacade neuralNetworkFacade) {
+        this.neuralNetworkFacade = neuralNetworkFacade;
+    }
+
+    public void showProgressBar(String message) {
+        progressBarFrame = new JFrame();
+        progressBar = new ProgressBar(progressBarFrame, true);
+        progressBar.showProgressBar(message);
+    }
+
+    public void stopProgressBar() {
+        progressBar.setVisible(false);
+        progressBarFrame.dispose();
+    }
+
+    public void initUI() {
+        mainFrame = getMainFrame();
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout(0, 0));
+        mainPanel.add(getTopPanel(), BorderLayout.NORTH);
+        mainPanel.add(getDrawAndResultPanel(), BorderLayout.CENTER);
+        mainPanel.add(getBottomPanel(), BorderLayout.SOUTH);
+        mainFrame.add(mainPanel, BorderLayout.CENTER);
+        mainFrame.setVisible(true);
+    }
+
+    private JPanel getDrawAndResultPanel() {
+        drawAndResultPanel = new JPanel(new GridLayout(0, 2));
+        drawArea = new DrawArea();
+        drawAndResultPanel.add(drawArea);
+        resultPanel = new JPanel();
+        drawAndResultPanel.add(resultPanel);
+        return drawAndResultPanel;
+    }
 
     private final Consumer<Integer> updateUI = prediction -> {
         JLabel predictNumber = new JLabel("" + prediction);
@@ -35,135 +90,70 @@ public class UI {
         resultPanel.updateUI();
     };
 
-    public UI(Function3<AIModelType, Integer, Integer, Boolean> train,
-            Function3<AIModelType, Image, Consumer<Integer>, Boolean> predict) throws Exception {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 18)));
-        UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 18)));
-
-        this.trainCallback = train;
-        this.predictCallback = predict;
+    private JPanel getBottomPanel() {
+        JPanel bottomPanel = new JPanel(new FlowLayout());
+        bottomPanel.add(getRecognizeButtonForSimpleNN());
+        bottomPanel.add(getRecognizeButtonForCNN());
+        bottomPanel.add(getClearButton());
+        bottomPanel.add(getSignatureLabel());
+        return bottomPanel;
     }
 
-    public void initUI() {
-        mainFrame = getMainFrame();
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(getTopPanel(), BorderLayout.NORTH);
-        mainPanel.add(getDrawAndDigitPredictionPanel(), BorderLayout.CENTER);
-        mainPanel.add(getSignatureLabel(), BorderLayout.SOUTH);
-        mainFrame.add(mainPanel, BorderLayout.CENTER);
-        mainFrame.setVisible(true);
-    }
 
-    private JPanel getDrawAndDigitPredictionPanel() {
-        drawAndDigitPredictionPanel = new JPanel(new GridLayout());
-        drawAndDigitPredictionPanel.add(getActionPanel());
-        drawArea = new DrawArea();
-        drawAndDigitPredictionPanel.add(drawArea);
-        resultPanel = new JPanel();
-        resultPanel.setLayout(new GridBagLayout());
-        drawAndDigitPredictionPanel.add(resultPanel);
-        return drawAndDigitPredictionPanel;
-    }
 
-    private JPanel getActionPanel() {
-        JPanel actionPanel = new JPanel(new GridLayout(8, 1));
-        actionPanel.add(getRecognizeButtonForSimpleNN());
-        actionPanel.add(getRecognizeButtonForCNN());
-        actionPanel.add(getClearButton());
-        return actionPanel;
+    private JSpinner getSpinner(int spinnerValue, int spinnerMin, int spinnerMax, int spinnerStepSize) {
+        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(spinnerValue, spinnerMin, spinnerMax, spinnerStepSize);
+        JSpinner spinner = new JSpinner(spinnerModel);
+        spinner.setFont(sansSerifBold);
+        return spinner;
     }
-
-    private JButton getRecognizeButtonForSimpleNN() {
-        JButton button = new JButton("Recognize Digit With Simple NN");
-        button.addActionListener(e -> this.predictCallback.apply(AIModelType.NEURAL, drawArea.getImage(), updateUI));
-        return button;
-    }
-
-    private JButton getRecognizeButtonForCNN() {
-        JButton button = new JButton("Recognize Digit With Conv NN");
-        button.addActionListener(
-                e -> this.predictCallback.apply(AIModelType.CONVOLUTIONAL, drawArea.getImage(), updateUI));
-        return button;
-    }
-
-    private JButton getClearButton() {
-        JButton button = new JButton("Clear");
-        button.addActionListener(e -> {
-            drawArea.setImage(null);
-            drawArea.repaint();
-            drawAndDigitPredictionPanel.updateUI();
-        });
-        return button;
-    }
-
     private JPanel getTopPanel() {
-        JPanel topPanel = new JPanel(new FlowLayout());
+        JPanel topPanel = new JPanel(new GridLayout(2, 3, 5, 5));
 
-        JButton trainNN = new JButton("Train NN");
-        trainNN.addActionListener(e -> {
-            int i = JOptionPane.showConfirmDialog(mainFrame, "Are you sure this may take some time to train?");
-            if (i == JOptionPane.OK_OPTION) {
+        JLabel trainDataLabel = new JLabel("Train Data");
+        trainDataSpinner = getSpinner(TRAIN_SIZE, 10000, 60000, 1000);
+        JPanel trainDataPanel = new JPanel();
+        trainDataPanel.add(trainDataLabel);
+        trainDataPanel.add(trainDataSpinner);
+
+        JLabel testDataLabel = new JLabel("Test Data");
+        testDataSpinner = getSpinner(TEST_SIZE, 1000, 10000, 500);
+        JPanel testDataPanel = new JPanel();
+        testDataPanel.add(testDataLabel);
+        testDataPanel.add(testDataSpinner);
+
+        JButton trainNNButton = getTrainButton("Train SimpleNN", "1 or 2 minutes", NeuralNetworkType.SIMPLE);
+        JButton trainCNNButton = getTrainButton("Train CNN", "more than 1 hour and >10GB Memory", NeuralNetworkType.CONVOLUTIONAL);
+
+        topPanel.add(trainDataPanel);
+        topPanel.add(testDataPanel);
+        topPanel.add(trainNNButton);
+        topPanel.add(trainCNNButton);
+
+        return topPanel;
+    }
+
+    private JButton getTrainButton(String text, String requirements, NeuralNetworkType type) {
+        JButton button = new JButton(text);
+        button.addActionListener(e -> {
+            int option = JOptionPane.showConfirmDialog(mainFrame, "Are you sure you want to proceed?\nTraining may take " + requirements);
+            if (option == JOptionPane.OK_OPTION) {
                 ProgressBar progressBar = new ProgressBar(mainFrame);
                 SwingUtilities
-                        .invokeLater(() -> progressBar.showProgressBar("Training may take one or two minutes..."));
+                        .invokeLater(() -> progressBar.showProgressBar("Training may take " + requirements));
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
-                        LOGGER.info("Start of train Neural Network");
-                        this.trainCallback.apply(AIModelType.NEURAL, (Integer) trainField.getValue(),
-                                (Integer) testField.getValue());
-                        LOGGER.info("End of train Neural Network");
+                        LOGGER.info("Start of " + text);
+                        this.neuralNetworkFacade.train(type, (Integer) trainDataSpinner.getValue(),
+                                (Integer) testDataSpinner.getValue());
+                        LOGGER.info("End of " + text);
                     } finally {
                         progressBar.setVisible(false);
                     }
                 });
             }
         });
-
-        JButton trainCNN = new JButton("Train Convolutional NN");
-        trainCNN.addActionListener(e -> {
-
-            int i = JOptionPane.showConfirmDialog(mainFrame,
-                    "Are you sure, training requires >10GB memory and more than 1 hour?");
-
-            if (i == JOptionPane.OK_OPTION) {
-                ProgressBar progressBar = new ProgressBar(mainFrame);
-                SwingUtilities.invokeLater(() -> progressBar.showProgressBar("Training may take a while..."));
-                Executors.newCachedThreadPool().submit(() -> {
-                    try {
-                        LOGGER.info("Start of train Convolutional Neural Network");
-                        this.trainCallback.apply(AIModelType.CONVOLUTIONAL, (Integer) trainField.getValue(),
-                                (Integer) testField.getValue());
-                        LOGGER.info("End of train Convolutional Neural Network");
-                    } finally {
-                        progressBar.setVisible(false);
-                    }
-                });
-            }
-        });
-
-        topPanel.add(trainCNN);
-        topPanel.add(trainNN);
-        JLabel tL = new JLabel("Training Data");
-        tL.setFont(sansSerifBold);
-        topPanel.add(tL);
-        int TRAIN_SIZE = 30000;
-        SpinnerNumberModel modelTrainSize = new SpinnerNumberModel(TRAIN_SIZE, 10000, 60000, 1000);
-        trainField = new JSpinner(modelTrainSize);
-        trainField.setFont(sansSerifBold);
-        topPanel.add(trainField);
-
-        JLabel ttL = new JLabel("Test Data");
-        ttL.setFont(sansSerifBold);
-        topPanel.add(ttL);
-        int TEST_SIZE = 10000;
-        SpinnerNumberModel modelTestSize = new SpinnerNumberModel(TEST_SIZE, 1000, 10000, 500);
-        testField = new JSpinner(modelTestSize);
-        testField.setFont(sansSerifBold);
-        topPanel.add(testField);
-        return topPanel;
-
+        return button;
     }
 
     private JFrame getMainFrame() {
@@ -184,10 +174,31 @@ public class UI {
     }
 
     private JLabel getSignatureLabel() {
-        JLabel signature = new JLabel("ramok.tech", JLabel.HORIZONTAL);
+        JLabel signature = new JLabel("ramok.tech", SwingConstants.CENTER);
         signature.setFont(new Font(Font.SANS_SERIF, Font.ITALIC, 20));
         signature.setForeground(Color.BLUE);
         return signature;
     }
 
+    private JButton getRecognizeButtonForSimpleNN() {
+        JButton button = new JButton("Recognize Digit With Simple NN");
+        button.addActionListener(e -> this.neuralNetworkFacade.test(NeuralNetworkType.SIMPLE, drawArea.getImage(), updateUI));
+        return button;
+    }
+
+    private JButton getRecognizeButtonForCNN() {
+        JButton button = new JButton("Recognize Digit With Conv NN");
+        button.addActionListener(
+                e -> this.neuralNetworkFacade.test(NeuralNetworkType.CONVOLUTIONAL, drawArea.getImage(), updateUI));
+        return button;
+    }
+
+    private JButton getClearButton() {
+        JButton button = new JButton("Clear");
+        button.addActionListener(e -> {
+            drawArea.reset();
+            drawAndResultPanel.updateUI();
+        });
+        return button;
+    }
 }

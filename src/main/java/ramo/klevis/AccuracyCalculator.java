@@ -8,8 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by klevis.ramo on 12/13/2017.
+ @author Klevis Ramo
+ @date 12/13/2017
  */
+
 public class AccuracyCalculator implements ScoreCalculator<MultiLayerNetwork> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccuracyCalculator.class);

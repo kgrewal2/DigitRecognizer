@@ -4,65 +4,22 @@ import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-
-import java.awt.Image;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-
 /**
  * Created by klevis.ramo on 11/24/2017.
  */
 public class Run {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Run.class);
-    private static JFrame mainFrame = new JFrame();
 
     public static void main(String[] args) throws Exception {
         BasicConfigurator.configure();
-
         LOGGER.info("Application is starting ... ");
-
-        Model model = new Model();
-        ModelAdapterFactory adapterFactory = new ModelAdapterFactory(
-                new MemoizedAIModelFactory(new NeuralNetworkFactory()));
-        Function3<AIModelType, Integer, Integer, Boolean> trainAdapter = adapterFactory.makeTrainAdapter(model);
-        Function3<AIModelType, Image, Consumer<Integer>, Boolean> predictAdapter = adapterFactory
-                .makePredictAdapter(model);
-
-        // TODO: Commented to run application.
-        // setHadoopHomeEnvironmentVariable();
-        ProgressBar progressBar = new ProgressBar(mainFrame, true);
-        progressBar.showProgressBar("Collecting data this make take several seconds!");
-        UI ui = new UI(trainAdapter, predictAdapter);
-        Executors.newCachedThreadPool().submit(() -> {
-            try {
-                ui.initUI();
-            } finally {
-                progressBar.setVisible(false);
-                mainFrame.dispose();
-            }
-        });
-    }
-
-    private static void setHadoopHomeEnvironmentVariable() throws Exception {
-        HashMap<String, String> hadoopEnvSetUp = new HashMap<>();
-        hadoopEnvSetUp.put("HADOOP_HOME", new File("resources/winutils-master/hadoop-2.8.1").getAbsolutePath());
-        Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
-        Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-        theEnvironmentField.setAccessible(true);
-        Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
-        env.clear();
-        env.putAll(hadoopEnvSetUp);
-        Field theCaseInsensitiveEnvironmentField = processEnvironmentClass
-                .getDeclaredField("theCaseInsensitiveEnvironment");
-        theCaseInsensitiveEnvironmentField.setAccessible(true);
-        Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
-        cienv.clear();
-        cienv.putAll(hadoopEnvSetUp);
+        UI.setUIManagerSettings();
+        UI ui = new UI();
+        ui.showProgressBar("Collecting data this make take several seconds!");
+        NeuralNetworkFacade neuralNetworkFacade = new NeuralNetworkFacade();
+        ui.setFacade(neuralNetworkFacade);
+        ui.stopProgressBar();
+        ui.initUI();
     }
 }

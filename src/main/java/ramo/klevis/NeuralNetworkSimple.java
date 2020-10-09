@@ -1,9 +1,5 @@
 package ramo.klevis;
 
-/*
-  Created by klevis.ramo on 11/27/2017.
- */
-
 import org.apache.spark.ml.classification.MultilayerPerceptronClassificationModel;
 import org.apache.spark.ml.classification.MultilayerPerceptronClassifier;
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
@@ -15,7 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class NeuralNetworkSimple implements AIModel, Initialized {
+/**
+ @author Klevis Ramo
+ @date 11/27/2017
+ */
+
+
+public class NeuralNetworkSimple implements NeuralNetwork {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NeuralNetworkSimple.class);
 
