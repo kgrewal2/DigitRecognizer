@@ -2,8 +2,8 @@ package ramo.klevis;
 
 import java.io.*;
 
-public class NeuralNetworkFactory implements AIModelFactory {
-    public AIModel makeAIModel(AIModelType type) throws IOException {
+public class NeuralNetworkFactory{
+    public NeuralNetwork makeAIModel(NeuralNetworkType type) throws IOException {
         switch (type) {
             case NEURAL: {
                 NeuralNetworkSimple network = new NeuralNetworkSimple();

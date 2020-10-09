@@ -5,36 +5,31 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class ModelAdapterFactory {
-    private MemoizedAIModelFactory factory;
+    private NeuralNetworkCache neuralNetworkCache;
 
     public ModelAdapterFactory() throws IOException {
-        this.factory = new MemoizedAIModelFactory(new NeuralNetworkFactory());
+        this.neuralNetworkCache = new NeuralNetworkCache();
     }
 
-    public Function3<AIModelType, Integer, Integer, Boolean> makeTrainAdapter(Model model) {
-        return (type, train, test) -> {
-            try {
-                Trainable trainable = this.factory.makeAIModel(type);
-                model.train(trainable, train, test);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        };
+    public boolean train(NeuralNetworkType type, Integer train, int test){
+        try {
+            Trainable trainable = this.neuralNetworkCache.getAIModel(type);
+            trainable.train(train, test);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
-    public Function3<AIModelType, Image, Consumer<Integer>, Boolean> makePredictAdapter(Model model) {
-        return (AIModelType type, Image drawImage, Consumer<Integer> uiCallback) -> {
-            try {
-                Predictor predictor = this.factory.makeAIModel(type);
-                LabeledImage image = LabeledImageFactory.fromImage(drawImage);
-                int predict = model.predict(predictor, image);
-
-                uiCallback.accept(predict);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        };
+    public boolean test(NeuralNetworkType type, Image drawImage, Consumer<Integer> uiCallback){
+        try {
+            Predictor predictor = this.neuralNetworkCache.getAIModel(type);
+            LabeledImage image = LabeledImageFactory.fromImage(drawImage);
+            int predict = predictor.predict(image);
+            uiCallback.accept(predict);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }

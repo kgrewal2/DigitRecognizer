@@ -27,17 +27,11 @@ public class Run {
 
         LOGGER.info("Application is starting ... ");
 
-        Model model = new Model();
         ModelAdapterFactory adapterFactory = new ModelAdapterFactory();
-        Function3<AIModelType, Integer, Integer, Boolean> trainAdapter = adapterFactory.makeTrainAdapter(model);
-        Function3<AIModelType, Image, Consumer<Integer>, Boolean> predictAdapter = adapterFactory
-                .makePredictAdapter(model);
 
-        // TODO: Commented to run application.
-        // setHadoopHomeEnvironmentVariable();
         ProgressBar progressBar = new ProgressBar(mainFrame, true);
         progressBar.showProgressBar("Collecting data this make take several seconds!");
-        UI ui = new UI(trainAdapter, predictAdapter);
+        UI ui = new UI(adapterFactory);
         Executors.newCachedThreadPool().submit(() -> {
             try {
                 ui.initUI();
@@ -46,22 +40,5 @@ public class Run {
                 mainFrame.dispose();
             }
         });
-    }
-
-    private static void setHadoopHomeEnvironmentVariable() throws Exception {
-        HashMap<String, String> hadoopEnvSetUp = new HashMap<>();
-        hadoopEnvSetUp.put("HADOOP_HOME", new File("resources/winutils-master/hadoop-2.8.1").getAbsolutePath());
-        Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
-        Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-        theEnvironmentField.setAccessible(true);
-        Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
-        env.clear();
-        env.putAll(hadoopEnvSetUp);
-        Field theCaseInsensitiveEnvironmentField = processEnvironmentClass
-                .getDeclaredField("theCaseInsensitiveEnvironment");
-        theCaseInsensitiveEnvironmentField.setAccessible(true);
-        Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
-        cienv.clear();
-        cienv.putAll(hadoopEnvSetUp);
     }
 }
