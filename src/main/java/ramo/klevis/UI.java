@@ -9,26 +9,37 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
+import java.util.function.*;
 
 public class UI {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UI.class);
 
-    private static final int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
+    private final static int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
+
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
-    int TRAIN_SIZE = 30000, TEST_SIZE = 10000;
+
+    private int TRAIN_SIZE = 30000, TEST_SIZE = 10000;
+
     private DrawArea drawArea;
     private JFrame mainFrame;
     private JPanel drawAndResultPanel;
     private JPanel resultPanel;
-
     private JSpinner testDataSpinner, trainDataSpinner;
-    private NeuralNetworkFacade neuralNetworkFacade;
     private ProgressBar progressBar;
     private JFrame progressBarFrame;
 
+    private Function<Integer, Function<Integer, Function<NeuralNetworkType, Boolean>>> trainCallback;
+    private Function<Image, Function<Consumer<Integer>, Function<NeuralNetworkType, Boolean>>> testCallback;
+
     public UI() {
+    }
+
+    public void setNeuralNetworkCallbacks(
+            Function<Integer, Function<Integer, Function<NeuralNetworkType, Boolean>>> train,
+            Function<Image, Function<Consumer<Integer>, Function<NeuralNetworkType, Boolean>>> test) {
+        this.trainCallback = train;
+        this.testCallback = test;
     }
 
     public static void setUIManagerSettings() {
@@ -38,16 +49,13 @@ public class UI {
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
 
         UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
         UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
-    }
-
-    public void setFacade(NeuralNetworkFacade neuralNetworkFacade) {
-        this.neuralNetworkFacade = neuralNetworkFacade;
     }
 
     public void showProgressBar(String message) {
@@ -99,14 +107,13 @@ public class UI {
         return bottomPanel;
     }
 
-
-
     private JSpinner getSpinner(int spinnerValue, int spinnerMin, int spinnerMax, int spinnerStepSize) {
         SpinnerNumberModel spinnerModel = new SpinnerNumberModel(spinnerValue, spinnerMin, spinnerMax, spinnerStepSize);
         JSpinner spinner = new JSpinner(spinnerModel);
         spinner.setFont(sansSerifBold);
         return spinner;
     }
+
     private JPanel getTopPanel() {
         JPanel topPanel = new JPanel(new GridLayout(2, 3, 5, 5));
 
@@ -123,7 +130,8 @@ public class UI {
         testDataPanel.add(testDataSpinner);
 
         JButton trainNNButton = getTrainButton("Train SimpleNN", "1 or 2 minutes", NeuralNetworkType.SIMPLE);
-        JButton trainCNNButton = getTrainButton("Train CNN", "more than 1 hour and >10GB Memory", NeuralNetworkType.CONVOLUTIONAL);
+        JButton trainCNNButton = getTrainButton("Train CNN", "more than 1 hour and >10GB Memory",
+                NeuralNetworkType.CONVOLUTIONAL);
 
         topPanel.add(trainDataPanel);
         topPanel.add(testDataPanel);
@@ -136,16 +144,17 @@ public class UI {
     private JButton getTrainButton(String text, String requirements, NeuralNetworkType type) {
         JButton button = new JButton(text);
         button.addActionListener(e -> {
-            int option = JOptionPane.showConfirmDialog(mainFrame, "Are you sure you want to proceed?\nTraining may take " + requirements);
+            int option = JOptionPane.showConfirmDialog(mainFrame,
+                    "Are you sure you want to proceed?\nTraining may take " + requirements);
             if (option == JOptionPane.OK_OPTION) {
                 ProgressBar progressBar = new ProgressBar(mainFrame);
-                SwingUtilities
-                        .invokeLater(() -> progressBar.showProgressBar("Training may take " + requirements));
+                SwingUtilities.invokeLater(() -> progressBar.showProgressBar("Training may take " + requirements));
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of " + text);
-                        this.neuralNetworkFacade.train(type, (Integer) trainDataSpinner.getValue(),
-                                (Integer) testDataSpinner.getValue());
+                        Integer trainCount = (Integer) trainDataSpinner.getValue();
+                        Integer testCount = (Integer) testDataSpinner.getValue();
+                        this.trainCallback.apply(trainCount).apply(testCount).apply(type);
                         LOGGER.info("End of " + text);
                     } finally {
                         progressBar.setVisible(false);
@@ -182,14 +191,15 @@ public class UI {
 
     private JButton getRecognizeButtonForSimpleNN() {
         JButton button = new JButton("Recognize Digit With Simple NN");
-        button.addActionListener(e -> this.neuralNetworkFacade.test(NeuralNetworkType.SIMPLE, drawArea.getImage(), updateUI));
+        button.addActionListener(
+                e -> this.testCallback.apply(drawArea.getImage()).apply(updateUI).apply(NeuralNetworkType.SIMPLE));
         return button;
     }
 
     private JButton getRecognizeButtonForCNN() {
         JButton button = new JButton("Recognize Digit With Conv NN");
-        button.addActionListener(
-                e -> this.neuralNetworkFacade.test(NeuralNetworkType.CONVOLUTIONAL, drawArea.getImage(), updateUI));
+        button.addActionListener(e -> this.testCallback.apply(drawArea.getImage()).apply(updateUI)
+                .apply(NeuralNetworkType.CONVOLUTIONAL));
         return button;
     }
 

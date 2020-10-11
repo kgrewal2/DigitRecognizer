@@ -2,34 +2,42 @@ package ramo.klevis;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.function.Consumer;
+import java.util.function.*;
 
 public class NeuralNetworkFacade {
     private final NeuralNetworkCache neuralNetworkCache;
 
     public NeuralNetworkFacade() throws IOException {
-        this.neuralNetworkCache = new NeuralNetworkCache();
+        this.neuralNetworkCache = new NeuralNetworkCache(NeuralNetworkFactory.factory);
     }
 
-    public boolean train(NeuralNetworkType type, Integer train, int test) {
-        try {
-            NeuralNetwork neuralNetwork = this.neuralNetworkCache.getNeuralNetwork(type);
-            neuralNetwork.train(train, test);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
+    // Integer -> Integer -> NeuralNetworkType -> Boolean
+    public Function<Integer, Function<Integer, Function<NeuralNetworkType, Boolean>>> train() {
+        return train -> test -> type -> {
+            try {
+                NeuralNetwork neuralNetwork = this.neuralNetworkCache.getNeuralNetwork(type);
+                neuralNetwork.train(train, test);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        };
     }
 
-    public boolean test(NeuralNetworkType type, Image drawImage, Consumer<Integer> uiCallback) {
-        try {
-            NeuralNetwork neuralNetwork = this.neuralNetworkCache.getNeuralNetwork(type);
-            LabeledImage image = LabeledImageFactory.fromImage(drawImage);
-            int predict = neuralNetwork.predict(image);
-            uiCallback.accept(predict);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
+    // Image -> Consumer<Integer> -> NeuralNetworkType -> Boolean
+    public Function<Image, Function<Consumer<Integer>, Function<NeuralNetworkType, Boolean>>> test() {
+        return drawImage -> uiCallback -> type -> {
+            try {
+                NeuralNetwork neuralNetwork = this.neuralNetworkCache.getNeuralNetwork(type);
+                LabeledImage image = LabeledImageFactory.factory.apply(drawImage);
+                int predict = neuralNetwork.predict(image);
+                uiCallback.accept(predict);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        };
     }
 }
