@@ -31,5 +31,5 @@ compileJava {
 }
 
 application {
-    mainClassName = 'ramo.klevis.Run'
+    mainClassName = 'ramo.klevis.App'
 }
