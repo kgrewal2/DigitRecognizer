@@ -9,7 +9,8 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.Executors;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class UI {
 
@@ -43,13 +44,6 @@ public class UI {
     public UI() {
     }
 
-    public void setNeuralNetworkCallbacks(
-            Function<Integer, Function<Integer, Function<NeuralNetworkType, Boolean>>> train,
-            Function<Image, Function<Consumer<Integer>, Function<NeuralNetworkType, Boolean>>> test) {
-        this.trainCallback = train;
-        this.testCallback = test;
-    }
-
     public static void setUIManagerSettings() {
         // TURN ON ANTIALIASING
         System.setProperty("awt.useSystemAAFontSettings", "on");
@@ -64,6 +58,13 @@ public class UI {
 
         UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
         UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
+    }
+
+    public void setNeuralNetworkCallbacks(
+            Function<Integer, Function<Integer, Function<NeuralNetworkType, Boolean>>> train,
+            Function<Image, Function<Consumer<Integer>, Function<NeuralNetworkType, Boolean>>> test) {
+        this.trainCallback = train;
+        this.testCallback = test;
     }
 
     public void showProgressBar(String message) {
@@ -204,7 +205,7 @@ public class UI {
     private JButton getRecognizeButtonFor(NeuralNetworkType type, String label) {
         JButton button = new JButton("Recognize Digit With " + label);
         button.addActionListener(
-                e -> this.neuralNetworkFacade.test(type, drawArea.getImage(), updateUI));
+                e -> this.testCallback.apply(drawArea.getImage()).apply(updateUI).apply(type));
         return button;
     }
 
