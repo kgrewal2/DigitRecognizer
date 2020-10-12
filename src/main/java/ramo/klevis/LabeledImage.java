@@ -11,8 +11,8 @@ import java.io.Serializable;
 public class LabeledImage implements Serializable {
     private final double[] pixels;
     private final double[] meanNormalizedFeatures;
-    private double label;
-    private Vector features;
+    private final double label;
+    private final Vector features;
 
     public LabeledImage(int label, double[] pixels) {
         this.pixels = pixels;

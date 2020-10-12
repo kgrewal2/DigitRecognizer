@@ -1,7 +1,6 @@
 package ramo.klevis;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -15,11 +14,24 @@ public class DrawArea extends JPanel {
     private Image image;
     private Graphics2D graphics2D;
     private int currentX, currentY, oldX, oldY; // Mouse Coordinates
+    private JPanel bottomPanel;
 
     public DrawArea() {
+        setLayout(new BorderLayout());
         setDoubleBuffered(false);
         UIUtilities.addBorderWithTitle(this,"Drawing Area");
         addListeners();
+        addBottomPanel();
+    }
+
+    private void addBottomPanel(){
+        bottomPanel = new JPanel();
+        bottomPanel.setBackground(Color.WHITE);
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    public void add(JButton button){
+        bottomPanel.add(button);
     }
 
     @Override
@@ -48,6 +60,13 @@ public class DrawArea extends JPanel {
     }
 
     private void addListeners() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                super.mouseEntered(e);
+                setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+            }
+        });
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 oldX = e.getX();

@@ -9,7 +9,7 @@ import java.awt.*;
 public class ProgressBar {
 
     private final JFrame mainFrame;
-    private JProgressBar progressBar;
+    private final JProgressBar progressBar;
     private boolean isUndecorated = false;
 
     public ProgressBar(JFrame mainFrame) {

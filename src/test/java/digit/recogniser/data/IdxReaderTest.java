@@ -16,12 +16,6 @@ import static ramo.klevis.IdxReader.INPUT_LABEL_PATH_TRAIN_DATA;
  * @author (created on 12 / 7 / 2017).
  */
 public class IdxReaderTest {
-
-    @Test // small amount of data
-    public void loadDataOne_Thousand() {
-        List<LabeledImage> labeledImages = IdxReader.loadData(100);
-    }
-
     /**
      * see the pdf with description of a data set
      */
