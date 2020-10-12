@@ -22,7 +22,14 @@ public class UI {
     private JFrame mainFrame;
     private JPanel drawAndResultPanel;
     private JPanel resultPanel;
-
+    private final Consumer<Integer> updateUI = prediction -> {
+        JLabel predictNumber = new JLabel("" + prediction);
+        predictNumber.setForeground(Color.RED);
+        predictNumber.setFont(new Font("SansSerif", Font.BOLD, 128));
+        resultPanel.removeAll();
+        resultPanel.add(predictNumber);
+        resultPanel.updateUI();
+    };
     private JSpinner testDataSpinner, trainDataSpinner;
     private NeuralNetworkFacade neuralNetworkFacade;
     private ProgressBar progressBar;
@@ -76,30 +83,25 @@ public class UI {
         drawAndResultPanel = new JPanel(new GridLayout(0, 2));
         drawArea = new DrawArea();
         drawAndResultPanel.add(drawArea);
-        resultPanel = new JPanel();
+        resultPanel = getResultPanel();
         drawAndResultPanel.add(resultPanel);
         return drawAndResultPanel;
     }
 
-    private final Consumer<Integer> updateUI = prediction -> {
-        JLabel predictNumber = new JLabel("" + prediction);
-        predictNumber.setForeground(Color.RED);
-        predictNumber.setFont(new Font("SansSerif", Font.BOLD, 128));
-        resultPanel.removeAll();
-        resultPanel.add(predictNumber);
-        resultPanel.updateUI();
-    };
+    private JPanel getResultPanel() {
+        JPanel resultPanel = new JPanel();
+        UIUtilities.addBorderWithTitle(resultPanel, "Result Area");
+        return resultPanel;
+    }
 
     private JPanel getBottomPanel() {
         JPanel bottomPanel = new JPanel(new FlowLayout());
-        bottomPanel.add(getRecognizeButtonForSimpleNN());
-        bottomPanel.add(getRecognizeButtonForCNN());
+        bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.SIMPLE, "Simple NN"));
+        bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.CONVOLUTIONAL, "CNN"));
         bottomPanel.add(getClearButton());
         bottomPanel.add(getSignatureLabel());
         return bottomPanel;
     }
-
-
 
     private JSpinner getSpinner(int spinnerValue, int spinnerMin, int spinnerMax, int spinnerStepSize) {
         SpinnerNumberModel spinnerModel = new SpinnerNumberModel(spinnerValue, spinnerMin, spinnerMax, spinnerStepSize);
@@ -107,6 +109,7 @@ public class UI {
         spinner.setFont(sansSerifBold);
         return spinner;
     }
+
     private JPanel getTopPanel() {
         JPanel topPanel = new JPanel(new GridLayout(2, 3, 5, 5));
 
@@ -180,16 +183,10 @@ public class UI {
         return signature;
     }
 
-    private JButton getRecognizeButtonForSimpleNN() {
-        JButton button = new JButton("Recognize Digit With Simple NN");
-        button.addActionListener(e -> this.neuralNetworkFacade.test(NeuralNetworkType.SIMPLE, drawArea.getImage(), updateUI));
-        return button;
-    }
-
-    private JButton getRecognizeButtonForCNN() {
-        JButton button = new JButton("Recognize Digit With Conv NN");
+    private JButton getRecognizeButtonFor(NeuralNetworkType type, String label) {
+        JButton button = new JButton("Recognize Digit With " + label);
         button.addActionListener(
-                e -> this.neuralNetworkFacade.test(NeuralNetworkType.CONVOLUTIONAL, drawArea.getImage(), updateUI));
+                e -> this.neuralNetworkFacade.test(type, drawArea.getImage(), updateUI));
         return button;
     }
 

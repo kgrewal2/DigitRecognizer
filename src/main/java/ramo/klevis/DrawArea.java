@@ -18,7 +18,7 @@ public class DrawArea extends JPanel {
 
     public DrawArea() {
         setDoubleBuffered(false);
-        setBorderWithLabel();
+        UIUtilities.addBorderWithTitle(this,"Drawing Area");
         addListeners();
     }
 
@@ -67,12 +67,6 @@ public class DrawArea extends JPanel {
                 }
             }
         });
-    }
-
-    private void setBorderWithLabel() {
-        Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Drawing Area",
-                TitledBorder.LEFT, TitledBorder.TOP, sansSerifBold, Color.BLUE));
     }
 
     public Image getImage() {
