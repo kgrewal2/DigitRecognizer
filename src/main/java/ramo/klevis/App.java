@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by klevis.ramo on 11/24/2017.
  */
-public class Run {
+public class App {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(Run.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws Exception {
         BasicConfigurator.configure();
