@@ -17,16 +17,14 @@ public class UI {
     private final static int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
     private static UI uiInstance = null;
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
-    private final int TRAIN_SIZE = 30000;
-    private final int TEST_SIZE = 10000;
     private DrawArea drawArea;
     private JFrame mainFrame;
     private JPanel drawAndResultPanel;
     private JPanel resultPanel;
     private final Consumer<Integer> updateUI = prediction -> {
         JLabel predictNumber = new JLabel("" + prediction);
-        predictNumber.setForeground(Color.RED);
-        predictNumber.setFont(new Font("SansSerif", Font.BOLD, 128));
+        predictNumber.setForeground(Color.DARK_GRAY);
+        predictNumber.setFont(new Font("SansSerif", Font.BOLD, mainFrame.getHeight()/4));
         resultPanel.removeAll();
         resultPanel.add(predictNumber);
         resultPanel.updateUI();
@@ -71,19 +69,22 @@ public class UI {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout(0, 0));
         mainPanel.add(getTopPanel(), BorderLayout.NORTH);
-        mainPanel.add(getDrawAndResultPanel(), BorderLayout.CENTER);
+        mainPanel.add(getCentralPanel(), BorderLayout.CENTER);
         mainPanel.add(getBottomPanel(), BorderLayout.SOUTH);
         mainFrame.add(mainPanel, BorderLayout.CENTER);
         mainFrame.setVisible(true);
     }
 
-    private JPanel getDrawAndResultPanel() {
+    private JPanel getCentralPanel() {
         drawAndResultPanel = new JPanel(new GridLayout(0, 2));
         drawArea = new DrawArea();
         drawArea.add(getClearButton());
         drawAndResultPanel.add(drawArea);
+        JPanel resultAndLoggerPanel = new JPanel(new GridLayout(2,1));
         resultPanel = getResultPanel();
-        drawAndResultPanel.add(resultPanel);
+        resultAndLoggerPanel.add(resultPanel);
+        resultAndLoggerPanel.add(getLogger());
+        drawAndResultPanel.add(resultAndLoggerPanel);
         return drawAndResultPanel;
     }
 
@@ -91,6 +92,10 @@ public class UI {
         JPanel resultPanel = new JPanel();
         UIUtilities.addBorderWithTitle(resultPanel, "Result Area");
         return resultPanel;
+    }
+    private JTextPane getLogger(){
+        JTextPane logger = new JTextPane();
+        return logger;
     }
 
     private JPanel getBottomPanel() {
@@ -131,14 +136,14 @@ public class UI {
     private JPanel getTrainingOptionsPanel(){
         // TRAIN DATA INPUT
         JLabel trainDataLabel = new JLabel("Train Data");
-        trainDataSpinner = getSpinner(TRAIN_SIZE, 10000, 60000, 1000);
+        trainDataSpinner = getSpinner(NeuralNetworkOptions.TRAIN_SIZE, NeuralNetworkOptions.MIN_TRAIN_SIZE, NeuralNetworkOptions.MAX_TRAIN_SIZE, 1000);
         JPanel trainDataPanel = new JPanel();
         trainDataPanel.add(trainDataLabel);
         trainDataPanel.add(trainDataSpinner);
 
         // TEST DATA INPUT
         JLabel testDataLabel = new JLabel("Test Data");
-        testDataSpinner = getSpinner(TEST_SIZE, 1000, 10000, 500);
+        testDataSpinner = getSpinner(NeuralNetworkOptions.TEST_SIZE, NeuralNetworkOptions.MIN_TEST_SIZE, NeuralNetworkOptions.MAX_TEST_SIZE, 500);
         JPanel testDataPanel = new JPanel();
         testDataPanel.add(testDataLabel);
         testDataPanel.add(testDataSpinner);

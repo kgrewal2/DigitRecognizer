@@ -106,6 +106,6 @@ public class NeuralNetworkConvolutional implements NeuralNetwork {
         }
 
         public static void main(String[] args) throws Exception {
-                new NeuralNetworkConvolutional().train(60000, 1000);
+                new NeuralNetworkConvolutional().train(NeuralNetworkOptions.CNN_TRAIN_SIZE, NeuralNetworkOptions.CNN_TEST_SIZE);
         }
 }
