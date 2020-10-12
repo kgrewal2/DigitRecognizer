@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -15,14 +14,11 @@ import java.util.function.Function;
 public class UI {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UI.class);
-
     private final static int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
-
+    private static UI uiInstance = null;
     private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
-
     private final int TRAIN_SIZE = 30000;
     private final int TEST_SIZE = 10000;
-
     private DrawArea drawArea;
     private JFrame mainFrame;
     private JPanel drawAndResultPanel;
@@ -38,27 +34,10 @@ public class UI {
     private JSpinner testDataSpinner, trainDataSpinner;
     private ProgressBar progressBar;
     private JFrame progressBarFrame;
-
     private Function<Integer, Function<Integer, Function<NeuralNetworkType, Boolean>>> trainCallback;
     private Function<Image, Function<Consumer<Integer>, Function<NeuralNetworkType, Boolean>>> testCallback;
 
-    public UI() {
-    }
-
-    public static void setUIManagerSettings() {
-        // TURN ON ANTIALIASING
-        System.setProperty("awt.useSystemAAFontSettings", "on");
-        System.setProperty("swing.aatext", "true");
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-                | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-        }
-
-        UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
-        UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
+    private UI() {
     }
 
     public void setNeuralNetworkCallbacks(
@@ -70,6 +49,7 @@ public class UI {
 
     public void showProgressBar(String message) {
         progressBarFrame = new JFrame();
+        progressBarFrame.setTitle("Loading...");
         progressBar = new ProgressBar(progressBarFrame, true);
         progressBar.showProgressBar(message);
     }
@@ -77,6 +57,13 @@ public class UI {
     public void stopProgressBar() {
         progressBar.setVisible(false);
         progressBarFrame.dispose();
+    }
+
+    public static UI getInstance() {
+        if (uiInstance == null) {
+            uiInstance = new UI();
+        }
+        return uiInstance;
     }
 
     public void initUI() {
@@ -123,6 +110,25 @@ public class UI {
     }
 
     private JPanel getTopPanel() {
+        JPanel topPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+        topPanel.add(getTrainingOptionsPanel());
+        topPanel.add(getStartTrainingPanel());
+        return topPanel;
+    }
+
+    private JPanel getStartTrainingPanel(){
+        JButton trainNNButton = getTrainButton("Simple Neural Network", "1 or 2 minutes", NeuralNetworkType.SIMPLE);
+        JButton trainCNNButton = getTrainButton("Convolutional Neural Network", "more than 1 hour and >10GB Memory",
+                NeuralNetworkType.CONVOLUTIONAL);
+
+        JPanel startTrainingPanel = new JPanel(new GridLayout(2, 1));
+        UIUtilities.addBorderWithTitle(startTrainingPanel, "Start Training");
+        startTrainingPanel.add(trainNNButton);
+        startTrainingPanel.add(trainCNNButton);
+        return startTrainingPanel;
+    }
+
+    private JPanel getTrainingOptionsPanel(){
         // TRAIN DATA INPUT
         JLabel trainDataLabel = new JLabel("Train Data");
         trainDataSpinner = getSpinner(TRAIN_SIZE, 10000, 60000, 1000);
@@ -137,24 +143,11 @@ public class UI {
         testDataPanel.add(testDataLabel);
         testDataPanel.add(testDataSpinner);
 
-        JPanel trainingOptionsPanel = new JPanel(new GridLayout(2,1));
+        JPanel trainingOptionsPanel = new JPanel(new GridLayout(2, 1));
         UIUtilities.addBorderWithTitle(trainingOptionsPanel, "Training Options");
         trainingOptionsPanel.add(trainDataPanel);
         trainingOptionsPanel.add(testDataPanel);
-
-        JButton trainNNButton = getTrainButton("Simple Neural Network", "1 or 2 minutes", NeuralNetworkType.SIMPLE);
-        JButton trainCNNButton = getTrainButton("Convolutional Neural Network", "more than 1 hour and >10GB Memory",
-                NeuralNetworkType.CONVOLUTIONAL);
-
-        JPanel startTrainingPanel = new JPanel(new GridLayout(2,1));
-        UIUtilities.addBorderWithTitle(startTrainingPanel, "Start Training");
-        startTrainingPanel.add(trainNNButton);
-        startTrainingPanel.add(trainCNNButton);
-
-        JPanel topPanel = new JPanel(new GridLayout(1, 2, 5, 5));
-        topPanel.add(trainingOptionsPanel);
-        topPanel.add(startTrainingPanel);
-        return topPanel;
+        return trainingOptionsPanel;
     }
 
     private JButton getTrainButton(String text, String requirements, NeuralNetworkType type) {
@@ -207,8 +200,8 @@ public class UI {
     }
 
     private JButton getRecognizeButtonFor(NeuralNetworkType type, String label) {
-        Color blueColor = new Color(156, 203, 255);
-        JButton button = UIUtilities.getFancyButton(label, blueColor);
+        Color lightBlueColor = new Color(156, 203, 255);
+        JButton button = UIUtilities.getFancyButton(label, lightBlueColor);
         button.addActionListener(
                 e -> this.testCallback.apply(drawArea.getImage()).apply(updateUI).apply(type));
         return button;

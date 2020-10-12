@@ -29,9 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by agibsonccc on 9/16/15.
- */
 public class NeuralNetworkConvolutional implements NeuralNetwork {
 
         private static final String OUT_DIR = "resources/cnnCurrentTrainingModels";
@@ -95,10 +92,11 @@ public class NeuralNetworkConvolutional implements NeuralNetwork {
                                                 testDataSize, false, false, true, 12345)))
                                 .evaluateEveryNEpochs(1).modelSaver(new LocalFileModelSaver(OUT_DIR)).build();
 
+
                 EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(earlyStoppingConfig, multiLayerConfiguration,
                                 mnistTrain);
 
-                EarlyStoppingResult result = trainer.fit();
+                EarlyStoppingResult<MultiLayerNetwork> result = trainer.fit();
 
                 LOG.info("Termination reason: " + result.getTerminationReason());
                 LOG.info("Termination details: " + result.getTerminationDetails());

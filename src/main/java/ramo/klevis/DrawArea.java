@@ -6,9 +6,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-/**
- * @author sylsau
- */
 public class DrawArea extends JPanel {
 
     private Image image;

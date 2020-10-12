@@ -2,8 +2,6 @@ package ramo.klevis;
 
 /**
  * For applying the convolution operator.
- *
- * @author: Simon Horne
  */
 public class Convolution extends Thread {
 

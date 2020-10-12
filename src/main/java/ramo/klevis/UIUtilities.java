@@ -3,9 +3,14 @@ package ramo.klevis;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+/**
+ * Contains methods and variables to change UI look and feel.
+ */
 
 public class UIUtilities {
     static final Border EMPTY_BORDER = BorderFactory.createEmptyBorder(5, 10, 5, 10);
@@ -55,5 +60,21 @@ public class UIUtilities {
         Font sansSerifBold = new Font("SansSerif", Font.ITALIC, 16);
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), title,
                 TitledBorder.LEFT, TitledBorder.TOP, sansSerifBold));
+    }
+
+    public static void setUIManagerSettings() {
+        // TURN ON ANTIALIASING
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("swing.aatext", "true");
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
+
+        UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
+        UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
     }
 }

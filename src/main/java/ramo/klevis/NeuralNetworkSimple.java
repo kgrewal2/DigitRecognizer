@@ -11,12 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- @author Klevis Ramo
- @date 11/27/2017
- */
-
-
 public class NeuralNetworkSimple implements NeuralNetwork {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(NeuralNetworkSimple.class);

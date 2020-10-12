@@ -7,11 +7,6 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- @author Klevis Ramo
- @date 12/13/2017
- */
-
 public class AccuracyCalculator implements ScoreCalculator<MultiLayerNetwork> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccuracyCalculator.class);

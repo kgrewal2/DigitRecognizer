@@ -26,66 +26,55 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by agibsonccc on 9/16/15.
- */
 public class LenetMnistExample {
-    private static final Logger log = LoggerFactory.getLogger(LenetMnistExample.class);
-    private static final String ouput = "C:\\Users\\klevis.ramo\\Desktop\\blog\\LeNet500_1.zip";
+    private static final Logger LOGGER = LoggerFactory.getLogger(LenetMnistExample.class);
+    // TODO: I changed the path here. (kgrewal2)
+    private static final String OUTPUT = "./LeNet500.zip";
 
     public static void main(String[] args) throws Exception {
-        int nChannels = 1; // Number of input channels
-        int outputNum = 10; // The number of possible outcomes
-        int batchSize = 64; // Test batch size
-        int nEpochs = 100; // Number of training epochs
-        int iterations = 1; // Number of training iterations
-        int seed = 123; //
+        int nInputChannels = 1;
+        int nPossibleOutcomes = 10;
+        int testBatchSize = 64;
+        int nEpochs = 100;
+        int nIterations = 1;
+        int seed = 123;
 
-        /*
-         * Create an iterator using the batch size for one iteration
-         */
-        log.info("Load data....");
-        DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, 12345);
+        LOGGER.info("Load data....");
+        DataSetIterator mnistTrain = new MnistDataSetIterator(testBatchSize, true, 12345);
 
-        /*
-         * Construct the neural network
-         */
-        log.info("Build model....");
+        LOGGER.info("Build model....");
+        // learningRateSchedule is Map<nIterations, learningRate>
+        Map<Integer, Double> learningRateSchedule = new HashMap<>();
+        learningRateSchedule.put(0, 0.01);
+        learningRateSchedule.put(1000, 0.005);
+        learningRateSchedule.put(3000, 0.001);
 
-        // learning rate schedule in the form of <Iteration #, Learning Rate>
-        Map<Integer, Double> lrSchedule = new HashMap<>();
-        lrSchedule.put(0, 0.01);
-        lrSchedule.put(1000, 0.005);
-        lrSchedule.put(3000, 0.001);
-
-        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed).iterations(iterations) // Training
-                                                                                                              // iterations
-                                                                                                              // as
-                                                                                                              // above
+        // Training
+        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed).iterations(nIterations)
                 .regularization(true).l2(0.0005)
+                .learningRate(.01)
+                // Uncomment the line below for learning decay and bias
+                // .biasLearningRate(0.02)
+                .learningRateDecayPolicy(LearningRatePolicy.Schedule)
                 /*
-                 * Uncomment the following for learning decay and bias
-                 */
-                .learningRate(.01)// .biasLearningRate(0.02)
+                NOTE: learningRateSchedule defined below overrides the rate set in `.learningRate()`
+                If you are using the Transfer Learning API, the same override will carry over to your new model configuration
+                */
+                .learningRateSchedule(learningRateSchedule)
+                // Uncomment the block below to use inverse policy rate decay for learning rate
                 /*
-                 * Alternatively, you can use a learning rate schedule. NOTE: this LR schedule
-                 * defined here overrides the rate set in .learningRate(). Also, if you're using
-                 * the Transfer Learning API, this same override will carry over to your new
-                 * model configuration.
-                 */
-                .learningRateDecayPolicy(LearningRatePolicy.Schedule).learningRateSchedule(lrSchedule)
-                /*
-                 * Below is an example of using inverse policy rate decay for learning rate
-                 */
-                // .learningRateDecayPolicy(LearningRatePolicy.Inverse)
-                // .lrPolicyDecayRate(0.001)
-                // .lrPolicyPower(0.75)
+                .learningRateDecayPolicy(LearningRatePolicy.Inverse)
+                .lrPolicyDecayRate(0.001)
+                .lrPolicyPower(0.75)
+                */
                 .weightInit(WeightInit.XAVIER).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(Updater.NESTEROVS) // To configure: .updater(new Nesterovs(0.9))
+                .updater(Updater.NESTEROVS)
+                // Uncomment the line below to configure Nesterovs
+                // .updater(new Nesterovs(0.9))
                 .list().layer(0, new ConvolutionLayer.Builder(5, 5)
-                        // nIn and nOut specify depth. nIn here is the nChannels and nOut is the number
-                        // of filters to be applied
-                        .nIn(nChannels).stride(1, 1).nOut(20).activation(Activation.IDENTITY).build())
+                // nIn() and nOut specifies the depth
+                // nOut is the number of filters to be applied
+                .nIn(nInputChannels).stride(1, 1).nOut(20).activation(Activation.IDENTITY).build())
                 .layer(1,
                         new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX).kernelSize(2, 2).stride(2, 2)
                                 .build())
@@ -97,11 +86,12 @@ public class LenetMnistExample {
                                 .build())
                 .layer(4, new DenseLayer.Builder().activation(Activation.RELU).nOut(500).build())
                 .layer(5,
-                        new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).nOut(outputNum)
+                        new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).nOut(nPossibleOutcomes)
                                 .activation(Activation.SOFTMAX).build())
-                .setInputType(InputType.convolutionalFlat(28, 28, 1)) // See note below
+                .setInputType(InputType.convolutionalFlat(28, 28, 1))
                 .backprop(true).pretrain(false).build();
 
+                // TODO: What to do with this comment?
         /*
          * Regarding the .setInputType(InputType.convolutionalFlat(28,28,1)) line: This
          * does a few things. (a) It adds preprocessors, which handle things like the
@@ -120,27 +110,26 @@ public class LenetMnistExample {
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
 
-        log.info("Train model....");
+        LOGGER.info("Train model....");
         model.setListeners(new ScoreIterationListener(1));
         DataSetIterator mnistTest = null;
         for (int i = 0; i < nEpochs; i++) {
             model.fit(mnistTrain);
-            log.info("*** Completed epoch {} ***", i);
+            LOGGER.info("*** Completed epoch {} ***", i);
             if (mnistTest == null) {
                 mnistTest = new MnistDataSetIterator(10000, false, 12345);
             }
-            log.info("Evaluate model....");
+            LOGGER.info("Evaluate model....");
             Evaluation eval = model.evaluate(mnistTest);
             if (eval.accuracy() >= 0.9901) {
-                File saveLocation = new File(ouput);
+                File saveLocation = new File(OUTPUT);
                 ModelSerializer.writeModel(model, saveLocation, true);
-                log.info("found ");
+                LOGGER.info("found ");
                 break;
             }
-            log.info(eval.stats());
+            LOGGER.info(eval.stats());
             mnistTest.reset();
         }
-
-        log.info("****************Example finished********************");
+        LOGGER.info("**********Example finished**********");
     }
 }

@@ -6,9 +6,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Created by klevis.ramo on 12/7/2017.
- */
 public class EdgeDetection {
 
     private static final double[][] FILTER_VERTICAL = {
@@ -42,7 +39,6 @@ public class EdgeDetection {
 
     private static double[][] applyConvolution(int width, int height, double[][][] image, double[][] filter) {
         Convolution convolution = new Convolution();
-        // TODO: wrong params are passed. height -to-> width. width -to-> height.
         double[][] redConvolvedImage = convolution.applyConvolutionWithPaddingIterative(image[0], height, width, filter, 3, 3, 1);
         double[][] greenConvolvedImage = convolution.applyConvolutionWithPaddingIterative(image[1], height, width, filter, 3, 3, 1);
         double[][] blueConvolvedImage = convolution.applyConvolutionWithPaddingIterative(image[2], height, width, filter, 3, 3, 1);

@@ -33,8 +33,7 @@ public class IdxReader {
         try (FileInputStream inputImage = new FileInputStream(inputImagePath);
              FileInputStream inputLabel = new FileInputStream(inputLabelPath)) {
 
-            // just skip the amount of a data
-            // see the test and description for dataset
+            // Skipped due to the format of the dataset
             inputImage.skip(16);
             inputLabel.skip(8);
             LOGGER.debug("Available bytes in inputImage stream after read: " + inputImage.available());
@@ -49,17 +48,15 @@ public class IdxReader {
                 if (i % 1000 == 0) {
                     LOGGER.info("Number of images extracted: " + i);
                 }
-                // it fills the array of pixels
                 for (int index = 0; index < VECTOR_DIMENSION; index++) {
                     imagePixels[index] = inputImage.read();
                 }
-                // it creates a label for that
                 int label = inputLabel.read();
                 labeledImageArrayList.add(new LabeledImage(label, imagePixels));
             }
             LOGGER.info("Time to load LabeledImages in seconds: " + ((System.currentTimeMillis() - start) / 1000d));
         } catch (Exception e) {
-            LOGGER.error("Smth went wrong: \n" + e);
+            LOGGER.error("Something went wrong: \n" + e);
             throw new RuntimeException(e);
         }
 
