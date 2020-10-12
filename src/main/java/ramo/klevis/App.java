@@ -18,7 +18,7 @@ public class App {
         UI ui = new UI();
         ui.showProgressBar("Collecting data this make take several seconds!");
         NeuralNetworkFacade neuralNetworkFacade = new NeuralNetworkFacade();
-        ui.setFacade(neuralNetworkFacade);
+        ui.setNeuralNetworkCallbacks(neuralNetworkFacade.train(), neuralNetworkFacade.test());
         ui.stopProgressBar();
         ui.initUI();
     }
