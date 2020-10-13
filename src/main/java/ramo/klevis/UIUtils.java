@@ -31,9 +31,7 @@ public class UIUtils {
     private static void addFancyButtonListeners(JButton button) {
         button.addMouseListener(new MouseListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
+            public void mouseClicked(MouseEvent e) {}
 
             @Override
             public void mousePressed(MouseEvent e) {
@@ -77,5 +75,13 @@ public class UIUtils {
 
         UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
         UIManager.put("ProgressBar.font", new FontUIResource(new Font("Dialog", Font.BOLD, 16)));
+    }
+
+    public static JProgressBar getProgressBar(String message){
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setString(message);
+        progressBar.setStringPainted(true);
+        progressBar.setIndeterminate(true);
+        return progressBar;
     }
 }

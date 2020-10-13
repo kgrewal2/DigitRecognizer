@@ -30,7 +30,6 @@ public class UI {
         resultPanel.updateUI();
     };
     private JSpinner testDataSpinner, trainDataSpinner;
-    private ProgressBar progressBar;
     private JFrame progressBarFrame;
     private Function<Integer, Function<Integer, Function<NeuralNetworkType, Boolean>>> trainCallback;
     private Function<Image, Function<Consumer<Integer>, Function<NeuralNetworkType, Boolean>>> testCallback;
@@ -45,15 +44,16 @@ public class UI {
         this.testCallback = test;
     }
 
-    public void showProgressBar(String message) {
+    public void showProgressBar() {
         progressBarFrame = new JFrame();
-        progressBarFrame.setTitle("Loading...");
-        progressBar = new ProgressBar(progressBarFrame, true);
-        progressBar.showProgressBar(message);
+        progressBarFrame.setTitle("Digit Recognizer");
+        progressBarFrame.add(UIUtils.getProgressBar("Starting Application: Digit Recognizer"));
+        progressBarFrame.setLocationRelativeTo(null);
+        progressBarFrame.pack();
+        progressBarFrame.setVisible(true);
     }
 
     public void stopProgressBar() {
-        progressBar.setVisible(false);
         progressBarFrame.dispose();
     }
 
@@ -97,8 +97,8 @@ public class UI {
     private JPanel getBottomPanel() {
         JPanel bottomPanel = new JPanel(new FlowLayout());
         bottomPanel.setBorder(UIUtils.getTitledBorder("Recognize Digit"));
-        bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.SIMPLE, "Simple Neural Network"));
-        bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.CONVOLUTIONAL, "Convolutional Neural Network"));
+        bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.SIMPLE, "Recognize with Simple Neural Network"));
+        bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.CONVOLUTIONAL, "Recognize with Convolutional Neural Network"));
         bottomPanel.add(getSignatureLabel());
         return bottomPanel;
     }
@@ -118,8 +118,8 @@ public class UI {
     }
 
     private JPanel getStartTrainingPanel(){
-        JButton trainNNButton = getTrainButton("Simple Neural Network", "1 or 2 minutes", NeuralNetworkType.SIMPLE);
-        JButton trainCNNButton = getTrainButton("Convolutional Neural Network", "more than 1 hour and >10GB Memory",
+        JButton trainNNButton = getTrainButton("Train: Simple Neural Network", "1 or 2 minutes", NeuralNetworkType.SIMPLE);
+        JButton trainCNNButton = getTrainButton("Train: Convolutional Neural Network", "more than 1 hour and >10GB Memory",
                 NeuralNetworkType.CONVOLUTIONAL);
 
         JPanel startTrainingPanel = new JPanel(new GridLayout(2, 1));
@@ -157,8 +157,8 @@ public class UI {
             int option = JOptionPane.showConfirmDialog(mainFrame,
                     "Are you sure you want to proceed?\nTraining may take " + requirements);
             if (option == JOptionPane.OK_OPTION) {
-                ProgressBar progressBar = new ProgressBar(mainFrame);
-                SwingUtilities.invokeLater(() -> progressBar.showProgressBar("Training may take " + requirements));
+                JProgressBar progressBar = UIUtils.getProgressBar("Training may take "+requirements);
+                SwingUtilities.invokeLater(() -> mainFrame.add(progressBar, BorderLayout.NORTH));
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of " + text);

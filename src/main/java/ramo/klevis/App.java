@@ -14,7 +14,7 @@ public class App {
         CustomLogger.init();
         LOGGER.info("Application is starting ... ");
         UI ui = UI.getInstance();
-        ui.showProgressBar("Collecting data this make take several seconds!");
+        ui.showProgressBar();
         NeuralNetworkFacade neuralNetworkFacade = new NeuralNetworkFacade();
         ui.setNeuralNetworkCallbacks(neuralNetworkFacade.train(), neuralNetworkFacade.test());
         ui.stopProgressBar();

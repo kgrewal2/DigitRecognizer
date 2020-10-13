@@ -43,6 +43,5 @@ public interface LabeledImageFactory extends Function<Image, LabeledImage> {
 
         return toBufferedImage.andThen(scaleBufferedImage).andThen(toBufferedImage).andThen(toOneDimensionalVector)
                 .andThen(scaledPixels -> new LabeledImage(0, scaledPixels)).apply(input);
-
     };
 }
