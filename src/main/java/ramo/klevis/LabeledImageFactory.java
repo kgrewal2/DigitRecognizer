@@ -7,8 +7,8 @@ import java.util.function.*;
 import com.mortennobel.imagescaling.ResampleFilters;
 import com.mortennobel.imagescaling.ResampleOp;
 
-public interface LabeledImageFactory extends Function<Image, LabeledImage> {
-    LabeledImageFactory factory = input -> {
+public class LabeledImageFactory {
+    public LabeledImage create(Image input) {
         Function<Image, BufferedImage> toBufferedImage = img -> {
             BufferedImage bufferedImageWithTransparency = new BufferedImage(img.getWidth(null), img.getHeight(null),
                     BufferedImage.TYPE_INT_ARGB);

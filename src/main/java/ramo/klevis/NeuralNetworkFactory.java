@@ -1,10 +1,7 @@
 package ramo.klevis;
 
-import java.util.function.Function;
-
-@FunctionalInterface
-public interface NeuralNetworkFactory extends Function<NeuralNetworkType, NeuralNetwork> {
-    NeuralNetworkFactory factory = type -> {
+public class NeuralNetworkFactory {
+    public NeuralNetwork create(NeuralNetworkType type) {
         switch (type) {
             case SIMPLE: {
                 return new NeuralNetworkSimple();
