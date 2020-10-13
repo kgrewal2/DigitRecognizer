@@ -48,6 +48,7 @@ public class UI {
         progressBarFrame.setTitle("Digit Recognizer");
         progressBarFrame.add(UIUtils.getProgressBar("Starting Application: Digit Recognizer"));
         progressBarFrame.setLocationRelativeTo(null);
+        progressBarFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         progressBarFrame.pack();
         progressBarFrame.setVisible(true);
     }
