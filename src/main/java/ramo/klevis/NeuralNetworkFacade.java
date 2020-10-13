@@ -8,7 +8,7 @@ public class NeuralNetworkFacade {
     private final NeuralNetworkCache neuralNetworkCache;
 
     public NeuralNetworkFacade() throws IOException {
-        this.neuralNetworkCache = new NeuralNetworkCache(NeuralNetworkFactory.factory);
+        this.neuralNetworkCache = new NeuralNetworkCache(new NeuralNetworkFactory());
     }
 
     // Integer -> Integer -> NeuralNetworkType -> Boolean
@@ -30,7 +30,7 @@ public class NeuralNetworkFacade {
         return drawImage -> uiCallback -> type -> {
             try {
                 NeuralNetwork neuralNetwork = this.neuralNetworkCache.getNeuralNetwork(type);
-                LabeledImage image = LabeledImageFactory.factory.apply(drawImage);
+                LabeledImage image = new LabeledImageFactory().create(drawImage);
                 int predict = neuralNetwork.predict(image);
                 uiCallback.accept(predict);
             } catch (Exception e) {
