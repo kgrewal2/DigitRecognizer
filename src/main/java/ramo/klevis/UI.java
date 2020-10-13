@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class UI {
-
     private final static Logger LOGGER = LoggerFactory.getLogger(UI.class);
     private final static int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
     private static UI uiInstance = null;
@@ -68,10 +67,10 @@ public class UI {
         mainFrame = getMainFrame();
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout(0, 0));
-        mainPanel.add(getTopPanel(), BorderLayout.NORTH);
+        mainPanel.add(getBottomPanel(), BorderLayout.NORTH);
         mainPanel.add(getCentralPanel(), BorderLayout.CENTER);
-        mainPanel.add(getBottomPanel(), BorderLayout.SOUTH);
-        mainFrame.add(mainPanel, BorderLayout.CENTER);
+        mainPanel.add(getSignatureLabel(), BorderLayout.SOUTH);
+        mainFrame.add(mainPanel);
         mainFrame.setVisible(true);
     }
 
@@ -99,18 +98,17 @@ public class UI {
         bottomPanel.setBorder(UIUtils.getTitledBorder("Recognize Digit"));
         bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.SIMPLE, "Recognize with Simple Neural Network"));
         bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.CONVOLUTIONAL, "Recognize with Convolutional Neural Network"));
-        bottomPanel.add(getSignatureLabel());
         return bottomPanel;
     }
 
     private JSpinner getSpinner(int spinnerValue, int spinnerMin, int spinnerMax, int spinnerStepSize) {
         SpinnerNumberModel spinnerModel = new SpinnerNumberModel(spinnerValue, spinnerMin, spinnerMax, spinnerStepSize);
         JSpinner spinner = new JSpinner(spinnerModel);
-        spinner.setFont(sansSerifBold);
+        spinner.setFont(UIUtils.SANS_SERIF_BOLD16);
         return spinner;
     }
 
-    private JPanel getTopPanel() {
+    private JPanel getTrainingPanel() {
         JPanel topPanel = new JPanel(new GridLayout(1, 2, 5, 5));
         topPanel.add(getTrainingOptionsPanel());
         topPanel.add(getStartTrainingPanel());
@@ -130,14 +128,12 @@ public class UI {
     }
 
     private JPanel getTrainingOptionsPanel(){
-        // TRAIN DATA INPUT
         JLabel trainDataLabel = new JLabel("Train Data");
         trainDataSpinner = getSpinner(NeuralNetworkOptions.TRAIN_SIZE, NeuralNetworkOptions.MIN_TRAIN_SIZE, NeuralNetworkOptions.MAX_TRAIN_SIZE, 1000);
         JPanel trainDataPanel = new JPanel();
         trainDataPanel.add(trainDataLabel);
         trainDataPanel.add(trainDataSpinner);
 
-        // TEST DATA INPUT
         JLabel testDataLabel = new JLabel("Test Data");
         testDataSpinner = getSpinner(NeuralNetworkOptions.TEST_SIZE, NeuralNetworkOptions.MIN_TEST_SIZE, NeuralNetworkOptions.MAX_TEST_SIZE, 500);
         JPanel testDataPanel = new JPanel();

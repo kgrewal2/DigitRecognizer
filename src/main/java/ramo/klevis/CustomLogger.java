@@ -41,19 +41,19 @@ class CustomLogger {
         return scrollablePane;
     }
 
-    public static void info(String string, Class c){
+    public static void info(String string, Class<?> c){
         log(string, c, LogType.INFO);
     }
 
-    public static void debug(String string, Class c){
+    public static void debug(String string, Class<?> c){
         log(string, c, LogType.DEBUG);
     }
 
-    public static void error(String string, Class c){
+    public static void error(String string, Class<?> c){
         log(string, c, LogType.ERROR);
     }
 
-    public static void log(String string, Class c, LogType logType){
+    private static void log(String string, Class<?> c, LogType logType){
         String className = c.toString().replace("class ","");
         String time = String.valueOf(Time.now() - initTime);
         String threadName = Thread.currentThread().getName();
@@ -67,6 +67,7 @@ class CustomLogger {
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
+            logger.setCaretPosition(logger.getDocument().getLength());
         }
     }
 

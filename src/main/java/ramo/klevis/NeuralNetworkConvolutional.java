@@ -7,6 +7,7 @@ import org.deeplearning4j.earlystopping.saver.LocalFileModelSaver;
 import org.deeplearning4j.earlystopping.termination.MaxEpochsTerminationCondition;
 import org.deeplearning4j.earlystopping.termination.MaxTimeIterationTerminationCondition;
 import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer;
+import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -47,7 +48,7 @@ public class NeuralNetworkConvolutional implements NeuralNetwork {
                         pixels[i] = pixels[i] / 255d;
                 }
                 int[] predict = pretrainedModel.predict(Nd4j.create(pixels));
-                CustomLogger.debug("Predicted Number: "+predict, this.getClass());
+                CustomLogger.info("Predicted Number: "+predict[0], this.getClass());
                 return predict[0];
         }
 
@@ -60,7 +61,7 @@ public class NeuralNetworkConvolutional implements NeuralNetwork {
                 int seed = 123;
 
                 MnistDataSetIterator mnistTrain = new MnistDataSetIterator(testBatchSize, trainDataSize, false, true,
-                                true, 12345);
+                                true, seed);
 
                 MultiLayerConfiguration multiLayerConfiguration = new NeuralNetConfiguration.Builder().seed(seed)
                                 .iterations(numTrainingIterations).regularization(false).learningRate(0.01)
