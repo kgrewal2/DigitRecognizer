@@ -83,24 +83,20 @@ public class UI {
         JPanel resultAndLoggerPanel = new JPanel(new GridLayout(2,1));
         resultPanel = getResultPanel();
         resultAndLoggerPanel.add(resultPanel);
-        resultAndLoggerPanel.add(getLogger());
+        resultAndLoggerPanel.add(CustomLogger.getLogger());
         drawAndResultPanel.add(resultAndLoggerPanel);
         return drawAndResultPanel;
     }
 
     private JPanel getResultPanel() {
         JPanel resultPanel = new JPanel();
-        UIUtilities.addBorderWithTitle(resultPanel, "Result Area");
+        resultPanel.setBorder(UIUtils.getTitledBorder("Result Area"));
         return resultPanel;
-    }
-    private JTextPane getLogger(){
-        JTextPane logger = new JTextPane();
-        return logger;
     }
 
     private JPanel getBottomPanel() {
         JPanel bottomPanel = new JPanel(new FlowLayout());
-        UIUtilities.addBorderWithTitle(bottomPanel, "Recognize Digit");
+        bottomPanel.setBorder(UIUtils.getTitledBorder("Recognize Digit"));
         bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.SIMPLE, "Simple Neural Network"));
         bottomPanel.add(getRecognizeButtonFor(NeuralNetworkType.CONVOLUTIONAL, "Convolutional Neural Network"));
         bottomPanel.add(getSignatureLabel());
@@ -127,7 +123,7 @@ public class UI {
                 NeuralNetworkType.CONVOLUTIONAL);
 
         JPanel startTrainingPanel = new JPanel(new GridLayout(2, 1));
-        UIUtilities.addBorderWithTitle(startTrainingPanel, "Start Training");
+        startTrainingPanel.setBorder(UIUtils.getTitledBorder("Start Training"));
         startTrainingPanel.add(trainNNButton);
         startTrainingPanel.add(trainCNNButton);
         return startTrainingPanel;
@@ -149,14 +145,14 @@ public class UI {
         testDataPanel.add(testDataSpinner);
 
         JPanel trainingOptionsPanel = new JPanel(new GridLayout(2, 1));
-        UIUtilities.addBorderWithTitle(trainingOptionsPanel, "Training Options");
+        trainingOptionsPanel.setBorder(UIUtils.getTitledBorder("Training Options"));
         trainingOptionsPanel.add(trainDataPanel);
         trainingOptionsPanel.add(testDataPanel);
         return trainingOptionsPanel;
     }
 
     private JButton getTrainButton(String text, String requirements, NeuralNetworkType type) {
-        JButton button = UIUtilities.getFancyButton(text, Color.LIGHT_GRAY);
+        JButton button = UIUtils.getFancyButton(text, Color.LIGHT_GRAY);
         button.addActionListener(e -> {
             int option = JOptionPane.showConfirmDialog(mainFrame,
                     "Are you sure you want to proceed?\nTraining may take " + requirements);
@@ -166,10 +162,12 @@ public class UI {
                 Executors.newCachedThreadPool().submit(() -> {
                     try {
                         LOGGER.info("Start of " + text);
+                        CustomLogger.info("Started Training: "+text, UI.class);
                         Integer trainCount = (Integer) trainDataSpinner.getValue();
                         Integer testCount = (Integer) testDataSpinner.getValue();
                         this.trainCallback.apply(trainCount).apply(testCount).apply(type);
                         LOGGER.info("End of " + text);
+                        CustomLogger.info("Successfully Trained: " + text, UI.class);
                     } finally {
                         progressBar.setVisible(false);
                     }
@@ -198,7 +196,7 @@ public class UI {
 
     private JLabel getSignatureLabel() {
         JLabel signature = new JLabel("ramok.tech", SwingConstants.CENTER);
-        signature.setBorder(UIUtilities.EMPTY_BORDER);
+        signature.setBorder(UIUtils.EMPTY_BORDER);
         signature.setFont(new Font(Font.SANS_SERIF, Font.ITALIC, 20));
         signature.setForeground(Color.BLUE);
         return signature;
@@ -206,17 +204,21 @@ public class UI {
 
     private JButton getRecognizeButtonFor(NeuralNetworkType type, String label) {
         Color lightBlueColor = new Color(156, 203, 255);
-        JButton button = UIUtilities.getFancyButton(label, lightBlueColor);
+        JButton button = UIUtils.getFancyButton(label, lightBlueColor);
         button.addActionListener(
-                e -> this.testCallback.apply(drawArea.getImage()).apply(updateUI).apply(type));
+                e -> {
+                    CustomLogger.info("Recognizing Digit with "+type.toString() + " Neural Network", UI.class);
+                    this.testCallback.apply(drawArea.getImage()).apply(updateUI).apply(type);
+                });
         return button;
     }
 
     private JButton getClearButton() {
-        JButton button = UIUtilities.getFancyButton("Clear", Color.LIGHT_GRAY);
+        JButton button = UIUtils.getFancyButton("Clear", Color.LIGHT_GRAY);
         button.addActionListener(e -> {
             drawArea.reset();
             drawAndResultPanel.updateUI();
+            CustomLogger.info("Cleared Drawing Panel", UI.class);
         });
         return button;
     }

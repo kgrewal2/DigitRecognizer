@@ -66,6 +66,7 @@ public class NeuralNetworkSimple implements NeuralNetwork {
 
     public int predict(LabeledImage labeledImage) {
         double predict = model.predict(labeledImage.getFeatures());
+        CustomLogger.debug("Predicted Number: "+predict, this.getClass());
         return (int) Math.floor(predict);
     }
 }

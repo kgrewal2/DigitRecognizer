@@ -47,7 +47,7 @@ public class NeuralNetworkConvolutional implements NeuralNetwork {
                         pixels[i] = pixels[i] / 255d;
                 }
                 int[] predict = pretrainedModel.predict(Nd4j.create(pixels));
-
+                CustomLogger.debug("Predicted Number: "+predict, this.getClass());
                 return predict[0];
         }
 

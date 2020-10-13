@@ -10,7 +10,8 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         BasicConfigurator.configure();
-        UIUtilities.setUIManagerSettings();
+        UIUtils.setUIManagerSettings();
+        CustomLogger.init();
         LOGGER.info("Application is starting ... ");
         UI ui = UI.getInstance();
         ui.showProgressBar("Collecting data this make take several seconds!");

@@ -12,10 +12,12 @@ import java.awt.event.MouseListener;
  * Contains methods and variables to change UI look and feel.
  */
 
-public class UIUtilities {
+public class UIUtils {
     static final Border EMPTY_BORDER = BorderFactory.createEmptyBorder(5, 10, 5, 10);
     static final Border RAISED_BORDER = BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), EMPTY_BORDER);
     static final Border LOWERED_BORDER = BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(), EMPTY_BORDER);
+    static final Font SANS_SERIF_BOLD16 = new Font("SansSerif", Font.ITALIC, 16);
+    static final Font MONO14 = new Font("Monospaced", Font.PLAIN, 14);
 
     public static JButton getFancyButton(String label, Color background) {
         JButton button = new JButton(label);
@@ -56,10 +58,9 @@ public class UIUtilities {
         });
     }
 
-    public static void addBorderWithTitle(JPanel panel, String title) {
-        Font sansSerifBold = new Font("SansSerif", Font.ITALIC, 16);
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), title,
-                TitledBorder.LEFT, TitledBorder.TOP, sansSerifBold));
+    public static Border getTitledBorder(String title){
+        return BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), title,
+                TitledBorder.LEFT, TitledBorder.TOP, SANS_SERIF_BOLD16);
     }
 
     public static void setUIManagerSettings() {

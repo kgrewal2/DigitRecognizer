@@ -16,7 +16,7 @@ public class DrawArea extends JPanel {
     public DrawArea() {
         setLayout(new BorderLayout());
         setDoubleBuffered(false);
-        UIUtilities.addBorderWithTitle(this,"Drawing Area");
+        setBorder(UIUtils.getTitledBorder("Drawing Area"));
         addListeners();
         addBottomPanel();
     }
