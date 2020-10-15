@@ -32,6 +32,7 @@ class CustomLogger {
 
     public static JScrollPane getLogger(){
         JTextPane newLoggerPane = new JTextPane();
+        newLoggerPane.setEditable(false);
         newLoggerPane.setBackground(Color.BLACK);
         newLoggerPane.setForeground(Color.WHITE);
         newLoggerPane.setFont(UIUtils.MONO14);
