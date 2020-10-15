@@ -15,7 +15,6 @@ public class UI {
     private final static Logger LOGGER = LoggerFactory.getLogger(UI.class);
     private final static int FRAME_WIDTH = 1200, FRAME_HEIGHT = 628;
     private static UI uiInstance = null;
-    private final Font sansSerifBold = new Font("SansSerif", Font.BOLD, 18);
     private DrawArea drawArea;
     private JFrame mainFrame;
     private JPanel drawAndResultPanel;

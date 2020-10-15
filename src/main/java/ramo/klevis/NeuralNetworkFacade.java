@@ -30,8 +30,7 @@ public class NeuralNetworkFacade {
         return drawImage -> uiCallback -> type -> {
             try {
                 NeuralNetwork neuralNetwork = this.neuralNetworkCache.getNeuralNetwork(type);
-                LabeledImage image = new LabeledImageFactory().create(drawImage);
-                int predict = neuralNetwork.predict(image);
+                int predict = neuralNetwork.predict(new LabeledImageFactory().create(drawImage));
                 uiCallback.accept(predict);
             } catch (Exception e) {
                 e.printStackTrace();

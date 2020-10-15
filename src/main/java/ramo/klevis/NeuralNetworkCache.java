@@ -15,8 +15,7 @@ public class NeuralNetworkCache {
         nnSimple.init();
         this.cachedNetworks.put(NeuralNetworkType.SIMPLE, nnSimple);
 
-        NeuralNetworkConvolutional nnConvolutional = (NeuralNetworkConvolutional) this.factory
-                .create(NeuralNetworkType.CONVOLUTIONAL);
+        NeuralNetwork nnConvolutional = this.factory.create(NeuralNetworkType.CONVOLUTIONAL);
         nnConvolutional.init();
         this.cachedNetworks.put(NeuralNetworkType.CONVOLUTIONAL, nnConvolutional);
     }
